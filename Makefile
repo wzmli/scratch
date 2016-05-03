@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget: poly.Rout 
+target pngtarget pdftarget vtarget acrtarget: nlme_bug.Rout 
 
 ##################################################################
 
@@ -17,9 +17,13 @@ include stuff.mk
 
 ## Content
 
-Sources += $(wildcard *.R)
+Sources += $(wildcard *.R *.rmd)
 
 poly.Rout: poly.R
+
+nlme.html: nlme.rmd
+
+nlme_bug.Rout: nlme_bug.R
 
 ######################################################################
 
@@ -32,4 +36,5 @@ poly.Rout: poly.R
 -include $(ms)/visual.mk
 
 -include $(ms)/wrapR.mk
-# -include $(ms)/oldlatex.mk
+-include $(ms)/oldlatex.mk
+-include $(ms)/pandoc.mk

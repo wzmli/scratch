@@ -1,0 +1,104 @@
+I have some questions about nlme and its behaviour when random effects are nearly singular.
+
+With some collaborators, we were interested in the question of whether we could robustly use mixed-effects models to analyze data with an unknown amount of redundancy. That is, two data points associated with the same individual could be different data points, or really the same. If really the same, they could look the same, or slightly different.
+
+This is a deep statistical question, which I guess I would like to discuss more, but here I want instead to discuss the strange results of the experiment we did on the subject.
+
+First, we made some fake data, and also a noise variable:
+
+```{r data}
+n <- 2000
+set.seed(2113)
+noise_factor <- 0.01
+
+id <- as.factor(1:n)
+x <- runif(n)
+y <- rnorm(n)
+noise <- rnorm(n)
+orig <- data.frame(id=id, x=x, y=y)
+```
+
+Then we made two data sets, each with two copies of the data. One had perfect copies, and one had some noise added.
+
+```{r redundant}
+make_frame <- function(id, x, y, noise){
+	return(data.frame(id = c(id, id)
+		, x = c(x, x)
+		, y = c(y, y+noise)
+	))
+}
+
+copy <- make_frame(id, x, y, 0)
+fuzzy <- make_frame(id, x, y, noise*noise_factor)
+```
+
+The question is: can a mixed model take one of these doubled data sets, and return something similar to the correct fit to the _original_ data set. That is, we want model results that look like what ```lm``` gives for the original data:
+
+```{r lm_orig}
+print(coef(summary(
+	lm(data = orig, y~x)
+)))
+```
+
+and not the inflated t statistics that it gives for redundant data.
+
+```{r lm_fuzzy}
+print(coef(summary(
+	lm(data = fuzzy, y~x)
+)))
+```
+
+On the fuzzy data, lme works exactly as hoped (it provides an answer consistent with treating the redundant data as redundant).
+
+```{r packages, message=FALSE}
+library(nlme)
+tfun_lme <- function(data) {
+    m1 <- lme(data=data, fixed = y~x, random = ~1|id, method="REML")
+    cat("fixed coefs:\n")
+    print(summary(m1)$tTab)
+    cat("RE variances:\n")
+    cat(as.numeric(VarCorr(m1)[,1]),"\n")
+}
+```
+
+```{r fuzzy}
+tfun_lme(fuzzy)
+```
+
+Both mixed-model approaches give precisely the $t$ values we are looking for. So far so good.
+
+Now for the exact copy data.
+
+```{r copy}
+tfun_lme(copy)
+```
+
+This is very alarming. nlme produces no warnings, and an answer that is apparently complete nonsense. I've tried this with different seeds, structures, etc … there is no easily discernible pattern, but the answers for copied data are reliably wrong. 
+
+These data are of course completely degenerate, and therefore a strange use case. I still claim that it's alarming to see a core package give wrong answers that could look right.
+
+A simple titration shows that the problem does not emerge until the noise is very small (but still detectably different from zero). All the answers after $10^{-9}$ are presumably technically wrong (since the answer should keep getting closer to the lm answer of .5041108), but they seem very close until we get ridiculously small perturbations.^[perhaps not coincidental, but $10^{-16}$ is approximately `.Machine$double.eps`, i.e. the smallest number where `1+x != x`]
+
+```{r titration,cache=TRUE}
+t_noise <- function(id, x, y, noise, nf){
+	nframe <- make_frame(id, x, y, noise*nf)
+	return(summary(lme(
+	data=nframe, fixed = y~x, random = ~1 | id
+	, method = "REML"
+))$tTab[["x", "t-value"]])
+}
+for (nf in 0.1^(1:17))
+	print(c(nf, t_noise(id, x, y, noise, nf)))
+```
+
+Guts of the estimation procedure for the
+estimated variance-covariance matrices of the
+fixed effects are in `nlme:::MEestimate`, and further
+embedded in C code `.C(mixed_estimate,...)`.
+I suspect that the proximal problem is that the
+residual standard error underflows to zero and something
+bad happens to the linear algebra.
+
+```{r sessionInfo}
+print(packageVersion("nlme"))
+```
