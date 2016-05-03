@@ -91,7 +91,7 @@ for (nf in 0.1^(1:17))
 	print(c(nf, t_noise(id, x, y, noise, nf)))
 ```
 
-Guts of the estimation procedure for the
+Note from Ben Bolker: Guts of the estimation procedure for the
 estimated variance-covariance matrices of the
 fixed effects are in `nlme:::MEestimate`, and further
 embedded in C code `.C(mixed_estimate,...)`.

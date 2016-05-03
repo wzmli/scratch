@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget: nlme_bug.Rout 
+target pngtarget pdftarget vtarget acrtarget: nlme.html 
 
 ##################################################################
 
