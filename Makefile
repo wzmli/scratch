@@ -25,6 +25,8 @@ nlme.html: nlme.rmd
 
 nlme_bug.Rout: nlme_bug.R
 
+Archive += nlme.html
+
 ######################################################################
 
 ### Makestuff
