@@ -5,14 +5,14 @@ x <- rnorm(reps)
 y <- x^2
 
 nsq <- function(n){
-	return(n/sqrt(mean(n^2)))
+	return(n/sqrt(sum(n^2)))
 }
 
 xhat <- nsq(x - mean(x))
 
-yhat <- nsq(y - mean(xhat*y)*xhat - mean(y))
+yhat <- nsq(y - sum(xhat*y)*xhat - mean(y))
 
 print(sum(xhat*yhat))
 
-print(data.frame(xhat/sqrt(reps), yhat/sqrt(reps)))
+print(data.frame(xhat, yhat))
 print(poly(x, 2))
