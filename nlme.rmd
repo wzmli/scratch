@@ -100,5 +100,5 @@ residual standard error underflows to zero and something
 bad happens to the linear algebra.
 
 ```{r sessionInfo}
-print(packageVersion("nlme"))
+sessionInfo()
 ```
