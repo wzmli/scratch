@@ -2,10 +2,9 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget: nlme.html 
+target pngtarget pdftarget vtarget acrtarget: johnson.Rout 
 
 ##################################################################
-
 
 # make files
 
@@ -17,7 +16,11 @@ include stuff.mk
 
 ## Content
 
-Sources += $(wildcard *.R *.rmd)
+Sources += $(wildcard *.R *.rmd *.mkd)
+
+##################################################################
+
+############ nlme "bug"
 
 poly.Rout: poly.R
 
@@ -26,6 +29,14 @@ nlme.html: nlme.rmd
 nlme_bug.Rout: nlme_bug.R
 
 Archive += nlme.html
+
+######################################################################
+
+####### Scoring stuff
+
+### Exploring the Johnson distribution
+
+johnson.Rout: johnson.R
 
 ######################################################################
 
