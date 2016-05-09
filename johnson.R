@@ -3,22 +3,21 @@ ssh <- function(x, s){
 	return(sinh(s*x)/s)
 }
 
-ssh(4, 0)
-ssh(4, 0.01)
-ssh(4, 1)
-
 wt <- function(v){
 	return((v[[3]]-v[[2]])/(v[[2]]-v[[1]]))
 }
 
-jsqwt <- function(q, phi){
-	return(wt(ssh(q-phi, phi)))
+## Weight of a Johnson function with scale=offset=phi, given a vector of values
+jsqwt <- function(phi, q, root=0){
+	return(wt(ssh(q-phi, phi))-root)
 }
 
-q <- c(0.25, 0.5, 0.75)
-qq <- qnorm(q)
-
-for (phi in -5:5){
-	print(log(jsqwt(qq, phi)))
+jsqphi <- function(wt, P=0.1, phiRange=c(-10, 10)){
+	qp <- c(P/2, 1/2, 1-P/2)
+	qq <- qnorm(qp)
+	return(uniroot(jsqwt, phiRange, q=qq, root=wt)$root)
 }
 
+print(jsqphi(1/2))
+print(jsqphi(1))
+print(jsqphi(2))
