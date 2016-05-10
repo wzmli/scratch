@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget: johnson.Rout 
+target pngtarget pdftarget vtarget acrtarget: ortho.Rout 
 
 ##################################################################
 
@@ -39,6 +39,11 @@ Archive += nlme.html
 johnson.Rout: johnson.R
 
 ######################################################################
+
+##### Orthogonality
+
+ortho.Rout: ortho.R
+lm.Rout: lm.R
 
 ### Makestuff
 
