@@ -3,7 +3,8 @@ set.seed(2123)
 
 lmnew <- function(formula){
 	mf <- model.frame(formula)
-	mm <- model.matrix(mf)
+	mt <- attr(mf, "terms")
+	mm <- model.matrix(mt, mf)
 	mr <- model.response(mf)
 	mfit <- lm.fit(mm, mr)
 	mfit$call <- match.call()
@@ -16,6 +17,6 @@ x <- rnorm(n)
 y <- rnorm(n)
 z <- rnorm(n)
 
-lm(z~x*y)
-lmnew(z~x*y)
+lm(z~poly(x, 2))
+lmnew(z~poly(x, degree=2))
 
