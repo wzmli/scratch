@@ -12,7 +12,6 @@ lmnew <- function(formula){
 	mf <- model.frame(formula)
 	mt <- attr(mf, "terms")
 	mm <- model.matrix(mt, mf)
-	return(qReduce(mm))
 	mr <- model.response(mf)
 	mfit <- lm.fit(mm, mr)
 	mfit$call <- match.call()
