@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget: ortho.Rout 
+target pngtarget pdftarget vtarget acrtarget: dplyr.Rout 
 
 ##################################################################
 
@@ -45,6 +45,7 @@ johnson.Rout: johnson.R
 ortho.Rout: ortho.R
 
 lm.Rout: lm.R
+dplyr.Rout: dplyr.R
 
 ### Makestuff
 
