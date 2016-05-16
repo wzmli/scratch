@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget: dplyr.Rout 
+target pngtarget pdftarget vtarget acrtarget: gavin70.pdf 
 
 ##################################################################
 
@@ -37,6 +37,8 @@ Archive += nlme.html
 ### Exploring the Johnson distribution
 
 johnson.Rout: johnson.R
+
+gavin70.pdf: gavin70.tex
 
 ######################################################################
 
