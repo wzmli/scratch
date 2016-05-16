@@ -38,7 +38,9 @@ Archive += nlme.html
 
 johnson.Rout: johnson.R
 
+Sources += gavin70.tex
 gavin70.pdf: gavin70.tex
+neighbors.Rout: neighbors.R
 
 ######################################################################
 
