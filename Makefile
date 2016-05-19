@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget: gavin70.pdf 
+target pngtarget pdftarget vtarget acrtarget: johnson.Rout 
 
 ##################################################################
 
