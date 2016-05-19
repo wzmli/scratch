@@ -1,0 +1,1 @@
+Rename everything; good names for functions, but also deal with the mu/sig confusion.
