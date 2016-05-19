@@ -55,9 +55,30 @@ jsqpar <- function(q, P=0.1, phiRange=c(-10, 10)){
 	return(list(eps=eps, lam=lam, phi=phi))
 }
 
+djsq <- function(j,  phi, eps=0, lam=1, pars=NULL){
+	if (!is.null(pars)) return(djsq(j, pars$phi, pars$eps, pars$lam))
+	j0 <- (j-eps)/lam
+	z <- assh(j0, phi)
+	zdens <- dnorm(z-phi)
+	return(zdens/(lam*cosh(phi*z)))
+}
+
 ## Parameters for a particular vector
-pars <- jsqpar(q=c(1, 2, 5), P=0.1)
+v <- c(1, 3, 4)
+P <- 0.1
+plim <- 0.01
+boxes <- 5000
 
-print(jsqfun(qnorm(qpfun(0.1)), pars=pars))
+pars <- jsqpar(q=v, P=P)
 
-ajsqfun(c(1, 2, 5), pars=pars)
+qlim <- (jsqfun(qnorm(qpfun(plim)), pars=pars))
+j <- seq(min(qlim), max(qlim), length.out=boxes+1)
+del <- (max(j) - min(j))/boxes
+j <- (j[-1] + j[-length(j)])/2
+
+dens <- djsq(j, pars=pars)
+plot(j, dens, type="l")
+print(del*sum(dens))
+print(plim/2+del*sum(dens[j<v[[1]]]))
+print(plim/2+del*sum(dens[j<v[[2]]]))
+print(plim/2+del*sum(dens[j<v[[3]]]))
