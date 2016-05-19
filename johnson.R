@@ -64,8 +64,8 @@ djsq <- function(j,  phi, eps=0, lam=1, pars=NULL){
 }
 
 ## Parameters for a particular vector
-v <- c(1, 3, 4)
 P <- 0.1
+v <- c(10, 25, 100)
 plim <- 0.01
 boxes <- 5000
 
