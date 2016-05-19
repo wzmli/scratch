@@ -2,7 +2,6 @@ qpfun <- function(P){
 	return(c(P/2, 1/2, 1-P/2))
 }
 
-# Scaled sinh function is meant to be smooth as scale goes through 0
 ssh <- function(x, s){
 	if (s==0) return(x)
 	return(sinh(s*x)/s)
@@ -13,20 +12,18 @@ assh <- function(x, s){
 	return(asinh(s*x)/s)
 }
 
-## A weight function takes a vector of three quantiles and computes the ratio between the two sides
 wtfun <- function(v){
 	if(length(v) != 3){
 		stop(paste("v is supposed to have length 3 in wtfun", length(v)))
 	}
+	return((v[[3]]-v[[2]])/(v[[2]]-v[[1]]))
+}
 
-## The weight of a scaled Johnson function constrained so that mu_N*sig_N=1
-## given quantile values
+## Weight of a Johnson function with scale=offset=phi, given a vector of values
 jsqwt <- function(phi, q, root=0){
 	return(wtfun(ssh(q-phi, phi))-root)
 }
 
-## Find the parameter for the desired weight of a constrained Johnson function
-## given quantile probabilities
 jsqphi <- function(wt, P=0.1, phiRange=c(-10, 10)){
 	qp <- qpfun(P)
 	qq <- qnorm(qp)
@@ -50,6 +47,8 @@ ajsqfun <- function(q, phi, eps=0, lam=1){
 ajsqpfun <- function(q, pars){
 	with(pars, return(ajsqfun(q, phi, eps, lam)))
 }
+
+
 
 jsqpar <- function(q, P=0.1, phiRange=c(-10, 10)){
 	wt <- wtfun(q)
