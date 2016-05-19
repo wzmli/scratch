@@ -2,6 +2,7 @@ qpfun <- function(P){
 	return(c(P/2, 1/2, 1-P/2))
 }
 
+# Scaled sinh function is meant to be smooth as scale goes through 0
 ssh <- function(x, s){
 	if (s==0) return(x)
 	return(sinh(s*x)/s)
@@ -12,6 +13,7 @@ assh <- function(x, s){
 	return(asinh(s*x)/s)
 }
 
+## Take a vector of three quantiles and computes the "weight" – the ratio between the two sides
 wtfun <- function(v){
 	if(length(v) != 3){
 		stop(paste("v is supposed to have length 3 in wtfun", length(v)))
@@ -19,9 +21,9 @@ wtfun <- function(v){
 	return((v[[3]]-v[[2]])/(v[[2]]-v[[1]]))
 }
 
-## Weight of a Johnson function with scale=offset=phi, given a vector of values
+## Weight of a constrained Johnson distribution (for calling by uniroot)
 jsqwt <- function(phi, q, root=0){
-	return(wtfun(ssh(q-phi, phi))-root)
+	return(wtfun(ssh(q+phi, phi))-root)
 }
 
 jsqphi <- function(wt, P=0.1, phiRange=c(-10, 10)){
@@ -31,24 +33,16 @@ jsqphi <- function(wt, P=0.1, phiRange=c(-10, 10)){
 }
 
 ## Transform a normal deviate to a Johnson deviate
-jsqfun <- function(q, phi, eps=0, lam=1){
-	return(ssh(q-phi, phi)*lam+eps)
-}
-
-## A wrapper for jsqfun that allows a list of parameters)
-jsqpfun <- function(q, pars){
-	with(pars, return(jsqfun(q, phi, eps, lam)))
+jsqfun <- function(z, phi, eps=0, lam=1, pars=NULL){
+	if (!is.null(pars)) return(jsqfun(z, pars$phi, pars$eps, pars$lam))
+	return(ssh(z+phi, phi)*lam+eps)
 }
 
 ## Transform a Johnson to a normal deviate 
-ajsqfun <- function(q, phi, eps=0, lam=1){
-	return(assh((q-eps)/lam, phi)+phi)
+ajsqfun <- function(j, phi, eps=0, lam=1, pars=NULL){
+	if (!is.null(pars)) return(ajsqfun(j, pars$phi, pars$eps, pars$lam))
+	return(assh((j-eps)/lam, phi)-phi)
 }
-ajsqpfun <- function(q, pars){
-	with(pars, return(ajsqfun(q, phi, eps, lam)))
-}
-
-
 
 jsqpar <- function(q, P=0.1, phiRange=c(-10, 10)){
 	wt <- wtfun(q)
@@ -61,8 +55,9 @@ jsqpar <- function(q, P=0.1, phiRange=c(-10, 10)){
 	return(list(eps=eps, lam=lam, phi=phi))
 }
 
-pars <- jsqpar(q=c(1, 2, 5))
+## Parameters for a particular vector
+pars <- jsqpar(q=c(1, 2, 5), P=0.1)
 
-print(jsqpfun(qnorm(qpfun(0.1)), pars))
+print(jsqfun(qnorm(qpfun(0.1)), pars=pars))
 
-ajsqpfun(c(1, 2, 5), pars)
+ajsqfun(c(1, 2, 5), pars=pars)
