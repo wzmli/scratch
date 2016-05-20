@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget: johnson.Rout 
+target pngtarget pdftarget vtarget acrtarget: nlme.html 
 
 ##################################################################
 
@@ -38,6 +38,7 @@ Archive += nlme.html
 
 johnson.Rout: johnson.R
 johnson.mkd: 
+johnson.html: johnson.Rmd 
 
 Sources += gavin70.tex
 gavin70.pdf: gavin70.tex
