@@ -1,12 +1,20 @@
 ## Calculating scores from quantiles using the Johnson distribution
 
-* [Code]{https://github.com/dushoff/scratch/blob/v0.1/johnson.R}
-* [Notes]{http://dushoff.github.io/notebook/qbd.html}
+* [Code](https://github.com/dushoff/scratch/blob/v0.3/johnson.R)
+* [Notes](http://dushoff.github.io/notebook/qbd.html)
 
 
 To use, you can load the code.
 ```{r load}
-source("https://raw.githubusercontent.com/dushoff/scratch/v0.1/johnson.R")
+source("https://raw.githubusercontent.com/dushoff/scratch/v0.3/johnson.R")
 ```
 
-To evaluate a data point, you would use `
+To evaluate a data point, you would use `jsqdens` to estimate the density at the observed point:
+
+```{r example}
+print(jsqdens(obs=195, q=c(7, 40, 122), P=0.5, logq=TRUE))
+```
+
+$q$ is the prediction with CIs; $P=0.5$ represents 50% CIs, and `logq` is used to do the calculation on the log scale (where it belongs for incidence; we might do something different for peak week, for example).
+
+Since $q$ is passed as a separate parameter, you would probably want to use `plyr` to CURR
