@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget: nlme.html 
+target pngtarget pdftarget vtarget acrtarget: johnson.html 
 
 ##################################################################
 
@@ -37,8 +37,9 @@ Archive += nlme.html
 ### Exploring the Johnson distribution
 
 johnson.Rout: johnson.R
+johnson_test.Rout: johnson.Rout johnson_test.R
 johnson.mkd: 
-johnson.html: johnson.Rmd 
+johnson.html: johnson.rmd 
 
 Sources += gavin70.tex
 gavin70.pdf: gavin70.tex

@@ -1,0 +1,12 @@
+## Calculating scores from quantiles using the Johnson distribution
+
+* [Code]{https://github.com/dushoff/scratch/blob/v0.1/johnson.R}
+* [Notes]{http://dushoff.github.io/notebook/qbd.html}
+
+
+To use, you can load the code.
+```{r load}
+source("https://raw.githubusercontent.com/dushoff/scratch/v0.1/johnson.R")
+```
+
+To evaluate a data point, you would use `
