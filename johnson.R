@@ -26,9 +26,9 @@ jsqwt <- function(phi, q, root=0){
 	return(wtfun(ssh(q+phi, phi))-root)
 }
 
-jsqphi <- function(wt, P=0.1, phiRange=c(-10, 10)){
-	qp <- qpfun(P)
-	qq <- qnorm(qp)
+jsqphi <- function(wt, P=0.1, phiRange=c(-10, 10), probs=NULL){
+	if(is.null(probs)) probs <- qpfun(P)
+	qq <- qnorm(probs)
 	return(uniroot(jsqwt, phiRange, q=qq, root=wt)$root)
 }
 
@@ -44,11 +44,11 @@ ajsqfun <- function(j, phi, eps=0, lam=1, pars=NULL){
 	return(assh((j-eps)/lam, phi)-phi)
 }
 
-jsqpar <- function(q, P=0.1, phiRange=c(-10, 10)){
+jsqpar <- function(q, P=0.1, phiRange=c(-10, 10), probs=NULL){
+	if(is.null(probs)) probs <- qpfun(P)
 	wt <- wtfun(q)
-	qp <- qpfun(P)
-	z <- qnorm(qp)
-	phi <- jsqphi(wt, P, phiRange)
+	z <- qnorm(probs)
+	phi <- jsqphi(wt, probs=probs, phiRange=phiRange)
 	q0 <- jsqfun(z, phi)
 	lam <- sd(q)/sd(q0)
 	eps <- mean(q)-lam*mean(q0)
@@ -63,22 +63,44 @@ djsq <- function(j,  phi, eps=0, lam=1, pars=NULL){
 	return(zdens/(lam*cosh(phi*z)))
 }
 
+jsqdens <- function(obs, q, P=0.1, probs=NULL, logq=FALSE){
+	if(is.null(probs)) probs <- qpfun(P)
+	if(logq){
+		lden <- jsqdens(log(obs), log(q), probs=probs)
+		return(lden/obs)
+	}
+	pars <- jsqpar(q=q, probs=probs)
+	djsq(obs, pars=pars)
+}
+
 ## Parameters for a particular vector
 P <- 0.1
-v <- c(10, 25, 100)
+v <- c(50, 80, 400)
 plim <- 0.01
 boxes <- 5000
 
 pars <- jsqpar(q=v, P=P)
 
 qlim <- (jsqfun(qnorm(qpfun(plim)), pars=pars))
+qlim <- c(10, 500)
+
 j <- seq(min(qlim), max(qlim), length.out=boxes+1)
-del <- (max(j) - min(j))/boxes
+
+del <- (j[-1] - j[-length(j)])
 j <- (j[-1] + j[-length(j)])/2
 
-dens <- djsq(j, pars=pars)
+dens <- jsqdens(j, q=v, P=P)
 plot(j, dens, type="l")
-print(del*sum(dens))
-print(plim/2+del*sum(dens[j<v[[1]]]))
-print(plim/2+del*sum(dens[j<v[[2]]]))
-print(plim/2+del*sum(dens[j<v[[3]]]))
+dd <- (del*dens)
+print(sum(dd))
+print(plim/2+sum(dd[j<v[[1]]]))
+print(plim/2+sum(dd[j<v[[2]]]))
+print(plim/2+sum(dd[j<v[[3]]]))
+
+dens <- jsqdens(j, q=v, P=P, logq=TRUE)
+plot(j, dens, type="l")
+dd <- (del*dens)
+print(sum(dd))
+print(plim/2+sum(dd[j<v[[1]]]))
+print(plim/2+sum(dd[j<v[[2]]]))
+print(plim/2+sum(dd[j<v[[3]]]))
