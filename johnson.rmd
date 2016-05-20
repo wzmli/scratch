@@ -1,20 +1,23 @@
 ## Calculating scores from quantiles using the Johnson distribution
 
-* [Code](https://github.com/dushoff/scratch/blob/v0.3/johnson.R)
 * [Notes](http://dushoff.github.io/notebook/qbd.html)
-
+* [Code](https://github.com/dushoff/scratch/blob/v0.3/johnson.R)
 
 To use, you can load the code.
 ```{r load}
 source("https://raw.githubusercontent.com/dushoff/scratch/v0.3/johnson.R")
 ```
 
-To evaluate a data point, you would use `jsqdens` to estimate the density at the observed point:
+To evaluate a data point, you would use `jsqdens` to estimate the density at the observed point.
+
+For example, if the prediction was 40 (50%CI, 7–122), and the observation was 195, you could construct a Johnson distribution on the log scale, and then project back and find the density of the distribution at the observed value, by saying:
 
 ```{r example}
 print(jsqdens(obs=195, q=c(7, 40, 122), P=0.5, logq=TRUE))
 ```
 
-$q$ is the prediction with CIs; $P=0.5$ represents 50% CIs, and `logq` is used to do the calculation on the log scale (where it belongs for incidence; we might do something different for peak week, for example).
+$q$ is the prediction with CIs; $P=0.5$ represents 50% CIs, and `logq` is used to do the calculation on the log scale.
 
-Since $q$ is passed as a separate parameter, you would probably want to use `plyr` to CURR
+The log scale seems like the sensible one to use for incidece or peak size. We might use the untransformed scale for incidence; we might do something different for peak week, for example.
+
+Since $q$ is passed as a separate parameter, the easiest way to implement this on a data frame would probably be to use `plyr`. I'm happy to keep working on this, if there is interest.
