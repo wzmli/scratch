@@ -1,12 +1,16 @@
 
 ### Linear fits and plots
-seqPlot <- function(CI, qlim, boxes, steps, logq=FALSE, P=0.1, plotlim=NULL){
+seqPlot <- function(
+	CI, qlim, boxes, steps, logq=FALSE, P=0.1, plotlim=NULL, medlist=NULL
+){
 	# List of medians
-	medlim <- CI
-	if (logq) medlim <- log(medlim)
-	medlist <- seq(from=min(medlim), to=max(medlim), length.out=steps+1)
-	medlist <- medlist[-c(1, steps+1)]
-	if (logq) medlist <- exp(medlist)
+	if (is.null(medlist)){
+		medlim <- CI
+		if (logq) medlim <- log(medlim)
+		medlist <- seq(from=min(medlim), to=max(medlim), length.out=steps+1)
+		medlist <- medlist[-c(1, steps+1)]
+		if (logq) medlist <- exp(medlist)
+	}
 
 	## Points of the distribution (and their differences)
 	j <- seq(min(qlim), max(qlim), length.out=boxes+1)
@@ -52,3 +56,5 @@ seqPlot (CI = CI
 	, logq=TRUE
 )
 
+## Arbitrary example from the .rmd
+seqPlot(CI=c(7, 122), medlist=40, boxes=10000, qlim=c(1, 200))
