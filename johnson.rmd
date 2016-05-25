@@ -1,7 +1,8 @@
-## Calculating scores from quantiles using the Johnson distribution
+## Calculating densities from quantiles using the Johnson distribution
 
 * [Notes](http://dushoff.github.io/notebook/qbd.html)
 * [Code](https://github.com/dushoff/scratch/blob/v0.3/johnson.R)
+* [Source](http://dushoff.github.io/notebook/johnsonrmd)
 
 To use, you can load the code.
 ```{r load}
@@ -22,7 +23,7 @@ The density that is inferred in this example looks like this:
 
 ![](johnson_test.Rout-2.png)
 
-The log scale seems like the sensible one to use for incidece or peak size. We might use the untransformed scale for incidence; we might do something different for peak week, for example.
+The log scale seems like the sensible one to use for incidence or peak size. We might use the untransformed scale for incidence; we might do something different for peak week, for example.
 
 The whole thing seems to work pretty well, but there are limitations:
 
@@ -32,11 +33,11 @@ The whole thing seems to work pretty well, but there are limitations:
 
 * assuming positivity and doing things on a log scale feels better for many epidemic predictions, but when things get near zero that gets a bit dicey. The classic trick of adding 1 to everything might be the best solution here, since 1 actually has a relevant meaning (it's a single discrete case, not something with units)
 
-Here are some sample distributions, generated on the linear scale. I used _90%_ CIs for this picture, I held constant at (25, 400), and varied the median linearly between them.
+Here are some sample distributions, generated on the linear scale. I used _90%_ CIs for this picture, I held constant at (25, 400), and varied the median linearly between them. The middle curve is a normal distribution (since the Johnson matches the normal when there is no skewness)
 
 ![](johnson_test.Rout-0.png)
 
-And here is a similar picture, generated on the log scale (with the median varied on the log scale).
+And here is a similar picture, generated on the log scale (with the median varied on the log scale). The middle curve is now lognormal.
 
 ![](johnson_test.Rout-1.png)
 
