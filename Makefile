@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: johnson.html 
+target pngtarget pdftarget vtarget acrtarget pushtarget: room.Rout 
 
 ##################################################################
 
@@ -31,6 +31,8 @@ nlme_bug.Rout: nlme_bug.R
 Archive += nlme.html
 
 ######################################################################
+
+room.Rout: room.R
 
 ####### Scoring stuff
 
