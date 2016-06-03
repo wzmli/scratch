@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: room.Rout 
+target pngtarget pdftarget vtarget acrtarget pushtarget: cards.Rout 
 
 ##################################################################
 
@@ -33,6 +33,19 @@ Archive += nlme.html
 ######################################################################
 
 room.Rout: room.R
+
+cards.Rout: cards.R
+
+cards.Routput.compare: cards.R
+
+%.setgoal: %
+	/bin/cp $@ $*.goal
+
+%.goal: 
+	/bin/cp $* $@
+
+%.compare: % %.goal
+	diff $* $*.goal > $@
 
 ####### Scoring stuff
 
