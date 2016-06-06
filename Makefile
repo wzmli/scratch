@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: cards.Rout 
+target pngtarget pdftarget vtarget acrtarget pushtarget: research_statement.pdf 
 
 ##################################################################
 
@@ -60,6 +60,11 @@ johnson.rmd: johnson_test.Rout-0.png johnson_test.Rout-1.png johnson_test.Rout-2
 Sources += gavin70.tex
 gavin70.pdf: gavin70.tex
 neighbors.Rout: neighbors.R
+
+Sources += research_statement.tex
+research_statement.pdf: research_statement.tex
+
+Archive += research_statement.pdf
 
 ######################################################################
 
