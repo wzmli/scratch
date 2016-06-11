@@ -1,0 +1,264 @@
+---
+title: "Simple (???) nonlinear fitting to a stochastic SIR simulation"
+date: "`r format(Sys.time(), '%H:%M %d %B %Y')`"
+author: Dora Rosati and Ben Bolker
+bibliography: optim.bib
+---
+
+<!-- http://stackoverflow.com/questions/33371061/r-knitr-kable-table-html-formatting -->
+
+<STYLE TYPE="text/css">
+  td{
+    padding:10px;
+    cellpadding="5";
+    cellspacing="5"
+  }
+</STYLE>
+
+This script demonstrates how to run one stochastic SIR simulation,
+fit a spline and the SIR model to that simulation, and plot the simulation
+and both fits on the same plot. It is very rough, simply demonstrating the
+basic steps.
+
+
+The Kermack-McKendrick SIR model is defined as
+$$
+\begin{split}
+\frac{dS}{dt} & = -(\beta/N) S \\
+\frac{dI}{dt} & = (\beta/N) S - \gamma I
+\end{split}
+$$
+(we will ignore the $R$ component).  We are going to go ahead and scale the transmission rate by $N$ (which is a constant anyway), for compatibility with the representation that the `fitsir` package uses.
+
+The key parameters here are $\beta$ (infection) and $\gamma$ (recovery)
+
+```{r pkgs,message=FALSE}
+library(GillespieSSA)
+library(bbmle)
+library(fitsir)
+library(bbmle)
+source("slice2D.R")  ## modified version, allows passing parameters to function
+library(lattice)
+library(lhs)
+library(ggplot2); theme_set(theme_bw())
+library(plyr)
+```
+
+Define parameters, system:
+```{r parms}
+parms <- c(beta=.5, gamma=.100, N=501)        # Parameters
+x0 <- c(S=500, I=1, R=0)                      # Initial state vector
+nu <- matrix(c(-1,0,1,-1,0,1),nrow=3,byrow=T) # State-change matrix
+a  <- c("beta/N*S*I", "gamma*I")              # Propensity vector
+tf <- 100                                     # Final time
+simName <- "Kermack-McKendrick SIR"
+## for future reference/use
+true_vals <- with(as.list(c(parms,x0)),
+                  c(log.beta=log(beta),
+                    log.gamma=log(gamma),
+                    log.N=log(N),
+                    logit.i=qlogis(I/N))) ## initial *proportion* of pop
+tp_true <- trans.pars(true_vals)
+```
+
+Direct method:
+```{r simSSA}
+set.seed(8)
+out <- ssa(x0,a,nu,parms,tf,method="D",simName,
+           verbose=FALSE,consoleInterval=Inf)
+```
+Note that it probably makes more sense in the long run to record the
+state of the system at a set of evenly spaced intervals (i.e. use
+the `censusInterval` parameter to `ssa`) rather than reporting every
+single interval as we do here.
+
+Extract infection data -- we only actually care about this so we're not keeping
+any of the other data right now.
+```{r ssa_out}
+stoch.sir.data <- as.data.frame(out$data,row.names=NA)
+names(stoch.sir.data)[1] <- "time"
+stoch.sir.data <- stoch.sir.data[c("time","I")]
+# determine when the infectives are gone, throw away everything else
+# (so we don't get in trouble looking at log(I))
+# alternatively subset(stoch.sir.data,I>0) ?
+last.index <- which(stoch.sir.data$I==0)[1] 
+stoch.sir.data <- stoch.sir.data[1:(last.index-1),]
+## ODE solution with the same time vector
+tvec <- stoch.sir.data$time
+ss_true <- SIR.detsim(tvec,tp_true)
+```
+
+Create spline fit:
+```{r splinefit}
+p1 <- smooth.spline(stoch.sir.data$time,log(stoch.sir.data$I),nknots=4)
+```
+
+Now use `fitsir::fitsir`:
+```{r fitsir1,cache=TRUE}
+## setup
+fitsir.data <- stoch.sir.data[c("time","I")]
+## **important** -- fitsir is expecting a time column called 'tvec'
+names(fitsir.data) <- c("tvec","count")
+m1 <- fitsir(data=fitsir.data)
+tp <- trans.pars(coef(m1)) # extracted parameters from sir fit
+ss <- SIR.detsim(stoch.sir.data$time,tp) # sim based on fit
+```
+
+We'll show the results (as well as the deterministic simulation based on the true parameter values, which does depart somewhat from this particular SSA realization):
+
+```{r plot0,echo=FALSE}
+## put together SSA, fit
+plotres <- ldply(list(SSA=stoch.sir.data,fit0=data.frame(time=tvec,I=ss),
+             spline=data.frame(time=p1$x,I=exp(p1$y)),
+             true=data.frame(time=tvec,I=ss_true)),
+             identity,.id="fit")
+print(gg0 <- ggplot(plotres,aes(time,I,colour=fit,linetype=fit))+geom_line()+
+    scale_colour_brewer(palette="Set1")+
+    scale_y_log10())
+```
+
+Well *that* looks bad ... how well do we do if we start at the true values??
+
+```{r truefit}
+m1_truestart <- fitsir(data=fitsir.data,start=true_vals)
+ss_truestart <- SIR.detsim(stoch.sir.data$time,trans.pars(coef(m1_truestart)))
+```
+
+```{r plot1,echo=FALSE}
+plotres <- rbind(plotres,data.frame(fit="truestart",time=tvec,
+                            I=ss_truestart))
+gg0 %+% plotres
+```
+
+Not bad (slightly worse at the tail end of the epidemic).
+In terms of more meaningful parameters ...
+
+```{r summarize_pars,echo=FALSE,results="as.is"}
+knitr::kable(rbind(true=summarize.pars(true_vals),
+      fit0=summarize.pars(coef(m1)),
+      truestart=summarize.pars(coef(m1_truestart))),digits=c(2,3,1,4),
+      format="html",pad=100)
+```
+
+For a given likelihood (or negative log-likelihood) surface $\mathcal F$
+with some point estimate $\hat \beta$,
+a "slice" (*sensu* Bolker) evaluates 2D grids
+$\mathcal F(\hat \beta_1,\ldots, \beta_i, \ldots, \beta_j, \ldots \hat \beta_N)$ for every $i$, $j$; that is, all but the focal parameters are held fixed at their point-estimate values. This isn't as good for inference as a true likelihood profile (which would involve optimizing the likelihood over all of the non-focal parameters), but it's generally good enough to get some idea of the geometry of the likelihood surface. 
+
+```{r slice,cache=TRUE,results="hide"}
+## try ranges of all parameters +/- 3 log (or logit) units from estimates
+raw_tp <- coef(m1)
+tmat <- cbind(round(raw_tp)-3,round(raw_tp)+3)
+ss <- slice2D(params=coef(m1),fun=m1@minuslogl,
+        count=stoch.sir.data$I,tvec=stoch.sir.data$time,
+        tranges=tmat)
+sfun <- function(s) {splom.slice(s,scale.min=FALSE,log="z",at=NULL) }
+sfun(ss)
+```
+
+What if we try lots of starting values (over the same wide range - $\pm 3$ on the log/logit scale around the initial fit we found)?
+
+```{r lhs,cache=TRUE}
+set.seed(101)
+lhs1 <- improvedLHS(n=100,k=4)
+lhs1_sc <- sweep(
+    sweep(lhs1,2,tmat[,2]-tmat[,1],"*"), ## stretch
+    2,tmat[,1],"+")  ## shift
+## check ...
+## apply(lhs1_sc,2,min)
+## apply(lhs1_sc,2,max)
+## try fitting from hypercube starts (could also use a Sobolev
+## sequence, etc etc etc ...)
+lhsres <- alply(lhs1_sc,1,
+             function(s) {
+    f <- try(fitsir(data=fitsir.data,
+                start=setNames(s,names(coef(m1)))))
+    if (is(f,"try-error")) return(NULL) else return(f)
+    })
+lhsres <- lhsres[!sapply(lhsres,is.null)]  ## strip out failures
+```
+
+Plotting the range of LHS results ...
+
+```{r lhs_sum,echo=FALSE}
+coefvals <- laply(lhsres,coef)
+gofvals <- -1*unlist(llply(lhsres,logLik))
+bestfit <- which.min(gofvals)
+par(bty="o")
+panelfun <- function(x,y,...) {
+    points(x,y)
+    pp <- par("mfg")
+    abline(v=true_vals[pp[2]],col=2,lty=3)
+    abline(h=true_vals[pp[1]],col=2,lty=3)
+    points(x[bestfit],y[bestfit],col="blue",pch=16)   
+}
+pairs(coefvals,gap=0,panel=panelfun)
+```
+
+Zoom in/ignore outliers?
+
+```{r lhssum2,echo=FALSE}
+c2 <- subset(as.data.frame(coefvals),
+             log.gamma>(-10) & log.beta<15)
+pairs(c2,gap=0,panel=panelfun)
+```
+
+How does the slice look if we narrow down to the scale in the plot above?
+Still pretty nasty. (Unfortunately, the ordering convention is different for `pairs()` and `splom()`, which makes it harder to compare the results ...)
+
+```{r slice2,echo=FALSE,results="hide",cache=TRUE}
+tmat2 <- cbind(apply(c2,2,min),apply(c2,2,max))
+truestart_tp <- coef(m1_truestart)
+ss2 <- slice2D(params=truestart_tp,fun=m1@minuslogl,
+        count=stoch.sir.data$I,tvec=stoch.sir.data$time,
+        tranges=tmat2)
+sfun(ss2)
+```
+
+
+```{r slice3,echo=FALSE,results="hide",cache=TRUE}
+dvec <- rep(0.025,4)
+tmat3 <- cbind(truestart_tp-dvec,truestart_tp+dvec)
+ss3 <- slice2D(params=truestart_tp,fun=m1@minuslogl,
+        count=stoch.sir.data$I,tvec=stoch.sir.data$time,
+        tranges=tmat3)
+##ss3$slices <- lapply(ss3$slices,
+##       function(x) lapply(x,function(x) if (is.null(x)) rep(NA,2) else range(x$z)))
+```
+
+If we zoom way in things start to look better, although still strongly correlated ...
+
+```{r plotslice3,echo=FALSE}
+splom(ss3,at=seq(2900,9000,by=200),scale.min=FALSE)
+```
+
+How does the trajectory look for the best result found from the Latin hypercube?
+```{r bestLHS}
+ss_bestlhs <- SIR.detsim(stoch.sir.data$time,trans.pars(coefvals[bestfit,]))
+```
+
+```{r plotbestLHS,echo=FALSE}
+plotres <- rbind(plotres,data.frame(fit="bestLHS",time=tvec,
+                            I=ss_bestlhs))
+gg0 %+% plotres
+```
+
+With the different line types, it's (just barely) possible to see that the "true start" and "best LHS" fits are right on top of each other.
+
+## Conclusions
+
+- the initial error (no longer shown) was getting the time parameter confused in `fitsir`; I think the interface for specifying the time vector is a little confusing, should probably be rethought.
+- we might have to work a lot harder to get good optimization results!
+
+## To do/possible strategies
+
+- some reparameterization that would (in particular) decorrelate $N$ and $\gamma$ ... ?
+- the (incomplete) self-starting algorithm outlined in the vignette
+- a more robust optimizer (e.g. `nloptr::bobyqa`)
+- stochastic global optimization (differential evolution etc.)?
+- switch ODE solvers?
+- use tools proposed by @raue_lessons_2013, i.e. sensitivity equations + LHS ??
+- even though we're not looking for inferential sophistication, could the big stochastic-nonlinear-time-series stuff (IF2/`pomp`, Stan) help? What about TMB?
+- anything useful in @hooker_parameterizing_2011 ... ?
+
+## References

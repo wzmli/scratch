@@ -32,6 +32,8 @@ Archive += nlme.html
 
 ######################################################################
 
+Sources += Policy_meeting.html
+
 room.Rout: room.R
 
 cards.Rout: cards.R
