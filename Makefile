@@ -22,6 +22,8 @@ Sources += $(wildcard *.R *.rmd *.mkd)
 
 ############ nlme "bug"
 
+stochSIRsample.pdf: stochSIRsample.rmd
+
 poly.Rout: poly.R
 
 nlme.html: nlme.rmd
@@ -53,6 +55,8 @@ cards.Routput.compare: cards.R
 
 ### Exploring the Johnson distribution
 
+factor.Rout: factor.R
+
 johnson.Rout: johnson.R
 johnson_test.Rout: johnson.Rout johnson_test.R
 johnson.mkd: 
@@ -76,6 +80,12 @@ ortho.Rout: ortho.R
 
 lm.Rout: lm.R
 dplyr.Rout: dplyr.R
+
+#### tSIR
+
+tSIR.Rout: tSIR.R
+
+######################################################################
 
 ### Makestuff
 
