@@ -24,7 +24,7 @@ fakesim.Rout: sim.Rout fakesim.R
 
 binfits.Rout: fakesim.Rout binfits.R
 
-Archive += fakesim.RData
+Archive += .fakesim.RData
 
 ######################################################################
 
