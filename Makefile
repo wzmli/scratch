@@ -84,6 +84,7 @@ dplyr.Rout: dplyr.R
 #### tSIR
 
 tSIR.Rout: tSIR.R
+Archive += tSIR.Rout
 
 ######################################################################
 

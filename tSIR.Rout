@@ -1,0 +1,54 @@
+> 
+> # Generated using wrapR file tSIR.wrapR.r
+> source('tSIR.R', echo=TRUE)
+
+> seed <- 94
+
+> rep <- 4000
+
+> N <- 1000
+
+> init <- 10
+
+> Rvec <- 2:4
+
+> trials <- 3
+
+> library(dplyr)
+
+> library(lme4)
+
+> dat <- data.frame(S = sample(1:N, rep, replace = TRUE), 
++     I = sample(1:init, rep, replace = TRUE), N = N, R = sample(Rvec, 
++         rep, repl .... [TRUNCATED] 
+
+> dat <- (dat %>% mutate(Inext = rbinom(rep, size = S, 
++     prob = 1 - exp(-R * I/N)), R = as.factor(R)))
+
+> fixed <- glm(Inext/S ~ R - 1 + offset(log(I/N)), family = binomial(link = cloglog), 
++     data = dat, weight = S)
+
+> exp(coef(fixed))
+      R2       R3       R4 
+2.011208 2.962251 3.960355 
+
+> randomLog <- glmer(Inext/S ~ R - 1 + offset(log(I/N)) + 
++     (1 | R/trial), family = binomial(link = log), data = dat, 
++     weight = S)
+
+> exp(fixef(randomLog))
+      R2       R3       R4 
+1.997163 2.931252 3.905314 
+
+> random <- try(glmer(Inext/S ~ R - 1 + offset(log(I/N)) + 
++     (1 | R/trial), family = binomial(link = cloglog), data = dat, 
++     weight = S))
+
+> print(random)
+[1] "Error in eval(expr, envir, enclos) : cannot generate feasible simplex\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<std::invalid_argument in eval(expr, envir, enclos): cannot generate feasible simplex>
+> # Wrapped output file tSIR.wrapR.rout
+> 
