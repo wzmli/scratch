@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: research_statement.pdf 
+target pngtarget pdftarget vtarget acrtarget pushtarget: tSIR.Rout 
 
 ##################################################################
 

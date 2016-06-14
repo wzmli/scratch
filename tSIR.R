@@ -8,6 +8,9 @@ trials <- 3
 library(dplyr)
 library(lme4)
 
+
+### Some simple data that I should be able to fit with cloglog or log
+### (log should work because I start with a small FoI)
 dat <- data.frame(
 	S=sample(1:N, rep, replace=TRUE)
 	, I=sample(1:init, rep, replace=TRUE)
@@ -23,11 +26,27 @@ dat <- (dat
 	)
 )
 
-rfit <- glmer(Inext/S ~ R-1 + offset(log(I/N)) + (1|trial) 
-	, family=binomial(link=log)
+## Fit the desired model with glm
+fixed <- glm(Inext/S ~ R-1 + offset(log(I/N))
+	, family=binomial(link=cloglog)
 	, data=dat
 	, weight=S
 )
 
-exp(fixef(rfit))
-summary(rfit)
+exp(coef(fixed))
+
+## Fit a log link (not ideal) with glmer
+randomLog <- glmer(Inext/S ~ R-1 + offset(log(I/N)) + (1|R/trial)
+	, family=binomial(link=log)
+	, data=dat
+	, weight=S
+)
+exp(fixef(randomLog))
+
+## Fit the desired cloglog link with glmer
+random <- try(glmer(Inext/S ~ R-1 + offset(log(I/N)) + (1|R/trial)
+	, family=binomial(link=cloglog)
+	, data=dat
+	, weight=S
+))
+print(random)
