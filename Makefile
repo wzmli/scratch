@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: tSIR.Rout 
+target pngtarget pdftarget vtarget acrtarget pushtarget: stochSIRsample.html
 
 ##################################################################
 
@@ -73,6 +73,11 @@ research_statement.pdf: research_statement.tex
 Archive += research_statement.pdf
 
 ######################################################################
+
+### Fitting from BB
+
+
+stochSIRsample.pdf: slice2D.R
 
 ##### Orthogonality
 
