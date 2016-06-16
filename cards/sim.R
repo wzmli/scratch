@@ -39,13 +39,14 @@ seed <- 42
 reps <- 5
 N <- 1000
 Rstart <- 1
-Rstop <- 3
+Rstop <- 4
 Rstep <- 1
 cards <- TRUE
 
 set.seed(seed)
 
-for (R0 in seq(from=Rstart, to=Rstop, by=Rstep)){
+Rseq <- seq(from=Rstart, to=Rstop, by=Rstep)
+for (R0 in Rseq){
 	for (r in 1:reps){
 		s <- sim(R0=R0, N=N, det=FALSE, cards=cards)
 		sf <- stepFrame(s)
