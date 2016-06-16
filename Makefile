@@ -86,8 +86,9 @@ ortho.Rout: ortho.R
 lm.Rout: lm.R
 dplyr.Rout: dplyr.R
 
-#### tSIR
+#### tSIR (move to cards/ subdirectory!)
 
+cards.Rout: cards.R
 tSIR.Rout: tSIR.R
 Archive += tSIR.Rout
 
