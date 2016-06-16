@@ -35,8 +35,8 @@ stepFrame <- function(f){
 }
 
 ## Do a bunch of sims with reps for varying values of R0
-seed <- 42
-reps <- 5
+seed <- 41
+reps <- 10
 N <- 1000
 Rstart <- 1
 Rstop <- 4

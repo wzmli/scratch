@@ -9,10 +9,8 @@ ffit <- glm(Inext/S ~ R0-1 + offset(log(I/N)) + R0:I
 
 print(exp(coef(ffit)))
 
-quit()
-
-s <- rep(0,length(Rseq))
-rfit <- try(glmer(Inext/S ~ R0-1 + offset(log(I/N)) + (1|R0:trial) 
+s <- rep(0,length(Rseq)+1)
+rfit <- try(glmer(Inext/S ~ R0-1 + offset(log(I/N)) + I + (1|R0:trial) 
 	, family=binomial(link=cloglog)
 	, data=dat
 	, weight=S
@@ -20,5 +18,4 @@ rfit <- try(glmer(Inext/S ~ R0-1 + offset(log(I/N)) + (1|R0:trial)
 	, start = list(fixef=s,theta=1)
 ))
 
-print(exp(fixef(rfit)))
-
+if (class(rfit)=="try-error") {print(rfit)} else print(exp(fixef(rfit)))
