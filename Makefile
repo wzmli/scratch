@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: stochSIRsample.html
+target pngtarget pdftarget vtarget acrtarget pushtarget: teaching_statement.pdf 
 
 ##################################################################
 
@@ -67,10 +67,17 @@ Sources += gavin70.tex
 gavin70.pdf: gavin70.tex
 neighbors.Rout: neighbors.R
 
-Sources += research_statement.tex
-research_statement.pdf: research_statement.tex
+### Promotion drafts
 
+Sources += research_statement.tex
+research_statement.pdf: fitpage.sty research_statement.tex
 Archive += research_statement.pdf
+
+Sources += teaching_statement.tex
+teaching_statement.pdf: teaching_statement.tex
+Archive += teaching_statement.pdf
+
+fitpage.sty:
 
 ######################################################################
 
