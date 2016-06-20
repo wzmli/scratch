@@ -1,21 +1,22 @@
-library(lme4)
+# library(lme4)
 
-ffit <- glm(Inext/S ~ R0-1 + offset(log(I/N)) + R0:I
+# Fit the card sims the way that works for the simple sims
+ffit <- glm(Inext/S ~ R0-1 + offset(log(I/N))
 	, family=binomial(link=cloglog)
 	, data=dat
 	, weight=S
 )
 
-
 print(exp(coef(ffit)))
 
-s <- rep(0,length(Rseq)+1)
-rfit <- try(glmer(Inext/S ~ R0-1 + offset(log(I/N)) + I + (1|R0:trial) 
+# Now attempt to correct for the inflation by projecting to low transmission
+tr <- with(dat, I*S)
+pfit <- glm(Inext/S ~ R0-1 + offset(log(I/N)) + R0:I
 	, family=binomial(link=cloglog)
 	, data=dat
 	, weight=S
-	, control=glmerControl(optimizer="bobyqa", nAGQ0initStep=FALSE)
-	, start = list(fixef=s,theta=1)
-))
+)
 
-if (class(rfit)=="try-error") {print(rfit)} else print(exp(fixef(rfit)))
+print(exp(coef(pfit)))
+
+# glmer stuff dropped for now

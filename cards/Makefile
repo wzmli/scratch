@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: cardfits.Rout 
+target pngtarget pdftarget vtarget acrtarget pushtarget: poisfits.Rout 
 
 ##################################################################
 
@@ -24,6 +24,7 @@ fakesim.Rout: sim.Rout fakesim.R
 
 binfits.Rout: fakesim.Rout binfits.R
 cardfits.Rout: fakesim.Rout cardfits.R
+poisfits.Rout: fakesim.Rout poisfits.R 
 
 Archive += .fakesim.RData
 
