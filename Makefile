@@ -22,6 +22,8 @@ Sources += $(wildcard *.R *.rmd *.mkd)
 
 ############ nlme "bug"
 
+dplyrOrder.Rout: dplyrOrder.R
+
 stochSIRsample.pdf: stochSIRsample.rmd
 
 poly.Rout: poly.R
