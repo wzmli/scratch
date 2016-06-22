@@ -72,7 +72,7 @@ neighbors.Rout: neighbors.R
 ### Promotion drafts
 
 Sources += research_statement.tex
-research_statement.pdf: fitpage.sty research_statement.tex
+rstructesearch_statement.pdf: fitpage.sty research_statement.tex
 Archive += research_statement.pdf
 
 Sources += teaching_statement.tex
