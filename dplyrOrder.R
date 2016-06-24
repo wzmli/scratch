@@ -1,4 +1,7 @@
 library(dplyr)
+
+options(stringsAsFactors=FALSE)  
+
 set.seed=101
 x <- rnorm(10)
 y <- rnorm(10)
@@ -10,7 +13,7 @@ df <- data.frame(x,y,z,a)
 se <- function(dframe){
   tempdat <- data.frame(variable=c("y","a","x","z"))
   print(tempdat)
-  tempdat2 <- tempdat %>% rowwise() %>% mutate(dplyrSD=sd(dframe[,as.character(variable)]))
+  tempdat2 <- tempdat %>% rowwise() %>% mutate(dplyrSD=sd(dframe[,variable]))
   return(tempdat2)
 }
 
