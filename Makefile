@@ -18,6 +18,9 @@ include stuff.mk
 
 Sources += $(wildcard *.R *.rmd *.mkd)
 
+tmp/new.Rout: new.R
+	$(run-R)
+
 ##################################################################
 
 ############ nlme "bug"
