@@ -47,6 +47,8 @@ cards.Rout: cards.R
 
 cards.Routput.compare: cards.R
 
+### Compare stuff; may be good for makestuff?
+
 %.setgoal: %
 	/bin/cp $@ $*.goal
 
