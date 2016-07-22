@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget: test.pdf 
+target pngtarget pdftarget vtarget acrtarget: draft.pdf 
 
 ##################################################################
 
@@ -17,19 +17,31 @@ include $(ms)/perl.def
 ## Content
 
 Sources += $(wildcard *.pl)
-Sources += $(wildcard *.tex)
+Sources += $(wildcard *.tex *.bib *.md)
 Sources += $(wildcard *.R)
 
 ######################################################################
 
+# Test files
+
+proposal.deps: proposal.tex
+proposal.pdf: proposal.tex
+
 test.deps: test.tex
 test.pdf: test.tex
+
+draft.deps:
+draft.pdf:
+
+ms.md.tex: ms.md
+	pandoc -o $@ --biblatex $<
 
 ## flextex.mk
 
 Sources += deps.mk
 
 latex = pdflatex -interaction=nonstopmode
+bibtex = biber
 
 .PRECIOUS: %.aux
 %.aux: /proc/uptime %.tex
@@ -37,12 +49,17 @@ latex = pdflatex -interaction=nonstopmode
 	- $(MAKE) -f deps.mk $@
 
 %.pdf: %.aux
+	touch $<
 	$(call hide, $<)
 	$(latex) $*
 	$(call difftouch, $<)
 
+%.bbl: %.tex 
+	/bin/rm -f $@
+	$(bibtex) $*
+
 %.reqs: %.deps
-	$(MAKE) -f $< -f Makefile $@
+	-$(MAKE) -f $< -f Makefile $@
 
 .PRECIOUS: %.deps
 %.deps: %.tex latexdeps.pl
@@ -54,4 +71,5 @@ latex = pdflatex -interaction=nonstopmode
 -include $(ms)/visual.mk
 
 -include $(ms)/wrapR.mk
+-include $(ms)/pandoc.mk
 # -include $(ms)/oldlatex.mk

@@ -1,0 +1,294 @@
+\documentclass[12pt]{article} 
+
+\newcommand{\authorname}{Jonathan Dushoff}
+
+\usepackage[top=1in,bottom=1in,left=1.00in,right=1.00in]{geometry}
+
+\usepackage{fancyhdr}
+\usepackage{hanging}
+\pagestyle{fancy}
+%\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\addtolength{\headheight}{0.5\baselineskip}
+
+\usepackage{xspace}
+\usepackage{graphicx}
+\usepackage{url}
+
+% \setlength{\textwidth}{7in}
+% \setlength{\textheight}{9in}
+
+\lhead{\textbf{\sectitle}}
+\chead{\proptitle}
+\rhead{\authorname}
+
+\lfoot{\small\rm CIHR Innovative Ebola Research}
+\cfoot{}
+\rfoot{Page \thepage\ of \numpages}
+
+\makeatletter
+\renewcommand{\section}{\@startsection  % see LaTeX Companion, p.26
+{section}%                           % the name
+{1}%                                 % the level
+{0mm}%                               % the indent
+{-0.5\baselineskip}%                 % the beforeskip
+{0.25\baselineskip}%                 % the afterskip
+{\normalfont\Large\bfseries}}%       % the style
+
+\renewcommand{\subsection}%
+{\vspace{0.0ex \@plus 3.0ex \@minus 1.0ex}\@startsection  % see LaTeX Companion, p.26
+{subsection}%                           % the name
+{2}%                                 % the level
+{0mm}%                               % the indent
+{0.75\baselineskip \@plus 0.25 ex}%                 % the beforeskip
+{0.25\baselineskip}%                 % the afterskip
+{\normalfont\large\bfseries}}%       % the style
+
+\renewcommand{\paragraph}{\vspace{0.40ex \@plus 0.2ex \@minus 0.0ex}\@startsection% see LaTeX Companion, p.26
+{paragraph}%                         % the name
+{3}%                                 % the level
+{\parindent}%                        % the indent
+{0.0\baselineskip}%                 % the beforeskip
+{-1em}%                              % the afterskip
+{\normalfont\normalsize\bfseries}}%  % the style
+
+\renewcommand{\thesubsubsection}{Aim \arabic{subsubsection}:}
+\makeatother
+
+\newcommand{\etal}{\emph{et al.}\xspace}
+\newcommand{\pcrit}{p_{\rm crit}}
+\newcommand{\eg}{\emph{e.g.,}\xspace}
+\newcommand{\ie}{\emph{i.e.,}\xspace}
+\newcommand{\R}{{\cal R}}
+
+% \usepackage{hyperref}
+% \hypersetup{pagebackref,
+%%%  colorlinks=true,  %%% This yields a bug in figure environment
+% citecolor=blue,
+% urlcolor=blue}
+
+\begin{document}
+
+\newcommand{\sectitle}{Research Proposal}
+\newcommand{\numpages}{10}
+\newcommand{\proptitle}{Advancing real-time\\ outbreak analysis}
+
+\section{Overview}
+
+Mathematical models of infectious disease spread link individual-level events and population-level processes. They are widely used to forecast epidemic size and severity, to plan and assess interventions, and to make inferences about disease natural history and host behaviour. During the recent Western African Ebola epidemic, models influenced international intervention efforts, including the allocation and placement of limited treatment resources, the provisioning of burial and contact tracing teams, and local Ebola awareness campaigns.
+
+Although models helped shape and evaluate the response to the epidemic, modelers also struggled to combine information and uncertainty from different data sources in real time. Different modeling groups used a variety of approaches to incorporating information and propagating uncertainty, often arriving at inconsistent estimates, with conflicting policy implications. This proposal is motivated by our belief that the modeling community can and should have more robust statistical frameworks readily available and equipped to provide rapid, consistent and useful guidance during future outbreaks of Ebola and other emerging infectious diseases.
+
+Epidemic models are often driven by two critical quantities that can be measured empirically: the rate of spread and the generation interval. The rate of spread describes how fast the disease is spreading at the population level, and is inferred primarily from case-incidence reports. The generation-interval distribution describes how fast the disease spreads at the individual level and is typically inferred from contact tracing, sometimes in combination with clinical data.  These two quantities are frequently both used as inputs in estimates of the reproductive number -- the number of new cases per case -- which is often seen as the most important measure of disease spread. Two diseases may exhibit the same population-level rate of spread but have substantially different generation intervals. Somewhat counter-intuitively, the disease with the faster generations will then have a lower reproductive number, making it require a smaller reduction in transmission for successful control (See Figure 1 in the supplement).
+
+While these two pieces of information are combined to make predictions about disease spread and the effectiveness of proposed interventions, no analysis to date has systematically combined uncertainty from generation-interval estimation with uncertainty from observation and disease-spread processes. We propose to improve and integrate the techniques commonly used to address these three key sources of uncertainty. We will use mathematical modeling and statistical inference to synthesize disparate data sources -- e.g., case histories, incidence reports, contact-tracing, genotyping -- into robust estimates of key parameters, while also accurately reflecting the uncertainty and biases inherent in each data type, thus providing information that can usefully inform decision-making and improving forecasts during an outbreak.
+
+\subsection{Specific aims}
+
+Our overarching aim is to develop tools for real-time forecasting of an emerging acute infectious disease epidemic and methods for evaluating intervention effectiveness. We will do this through five aims.
+
+\begin{hangparas}{.25in}{1}\textbf{1. Improving estimation of generation intervals.} We will improve methods for estimating generation intervals from growing epidemics to account for both bias and uncertainty caused by right-censored of contact tracing data. \end{hangparas}
+
+\begin{hangparas}{.25in}{1}\textbf{2. Reliable estimation of the reproductive number.} We will build on the methods developed in Aim 1 to combine contact tracing and case incidence report data to better estimate the reproductive number of a growing epidemic, the associated uncertainty, and the effectiveness of interventions to stop it. \end{hangparas}
+
+\begin{hangparas}{.25in}{1}\textbf{3. Accounting for surveillance effort, coverage and biases.} We will further improve the accuracy of epidemic growth estimation tools developed in Aims 1-2 by accounting for the case detection process itself, embedding models of surveillance that account for delays between symptom onset and case confirmation, and that draw on temporal variation in the positive proportion of laboratory tested cases and in missing links in contact tracing transmission chains. \end{hangparas}
+
+\begin{hangparas}{.25in}{1}\textbf{4. Retrospective analysis of the West African Ebola Epidemic.} We will apply our methods from Aims 1-3 above to retrospectively analyze the West African Ebola epidemic to assess what could have been known, and with what certainty, about the rate of spread based on the data available at different times during the course of the outbreak, including the addition of new data sets and the disaggregation of previously aggregated data sets.  \end{hangparas}
+
+\section{Background}
+
+\subsection{Epidemiology}
+
+Ebola virus disease (EVD) is caused by Ebola virus, a member of the Filoviridae family of RNA viruses, and one of the most virulent pathogens known to humans, with case fatality rates ranging from 50-90\% \cite{Leroy2011,YamiGert15}. Five different strains of Ebola virus have been isolated and fruit bats are considered the most likely reservoir from which humans acquire exposure, either directly or via intermediate non-human primate hosts or antelope \cite{Chowell2014}. EVD is transmitted by direct contact with the bodily fluids of an infected individual, with infectiousness dramatically increasing during the late stages of disease, which are characterized by fever, sore throat vomiting, diarrhea, headache, and occasionally internal and external hemorrhaging.
+
+Ebola outbreaks in human populations have been reported since 1976, primarily in central Africa (the most afflicted countries being DRC, Uganda, Sudan, Congo and Gabon). Until 2014 all previous Ebola outbreaks had been confined to remote rural settings, which is thought to have limited their size. Specifically, of 25 previously recorded outbreaks, 7 reported between 100 and 500 cases with the remaining 18 comprising less than  100 cases \cite{Groseth2007a}).
+
+In contrast, the West Africa Ebola epidemic began in Guinea in December 2013 and within 3 months spread to urban settings and, shortly thereafter, to neighboring countries, leading to apparently self-sustaining epidemics in Sierra Leone and Liberia. The high contact rate in urban centres, an unprepared and under-resourced health system, and distrust of authority driven by decades of civil unrest sparked the largest Ebola outbreak ever seen: more than 27,000 cases and 11,000 deaths have been reported \cite{AlexSand15}. Both Sierra Leone and Guinea still report new cases every week, with 12 and 13 confirmed cases during the last week of May 2015 respectively. Sustained vigilance remains vital in order to prevent a resurgence, particularly because some of these cases are not linked to identified contacts of primary cases.
+
+\subsection{Intervention}
+
+While two phase III clinical trials of EVD candidate vaccines are currently underway, no licensed vaccine currently exists. Prevention of EVD transmission thus primarily relies on non-pharmaceutical interventions which aim to prevent contact with the infectious bodily fluids or bodies of those who have died. The close timing of EVD’s conspicuous symptoms with the onset of viral shedding make contact tracing and case isolation an effective intervention for limiting further transmission during outbreaks \cite{YamiGert15}. The extremely high infectiousness of EVD cases after death also makes safe burials an important part of EVD control (Pandey2014). While no specific therapeutic interventions have been licensed against EVD, supportive care has shown promise in mitigating the case fatality rate. In particular, oral or intravenous rehydration therapy may improve patient outcomes \cite{Bah2014}
+
+\subsection{Previous modeling work}
+
+Determining the reproductive number of a disease -- the mean number of new cases per case -- is the typical focus for evaluating the spread of infectious diseases in a population.  The reproductive number aggregates many individual factors governing epidemic spread, and is used to assess when interventions can eliminate disease (Dietz 1993). Calculating reproductive numbers for various diseases has been a subject of intense study for  over a century \cite{Ross11, KermMcKe27}.  A related property, the rate of exponential growth (which establishes the doubling time), is less appreciated but also critical;  it is often used as the basis for calculating the reproductive number, as well as for making for short-term forecasts \cite{Meltzer2014}.
+
+The generation-interval distribution is also a fundamental quantity when analyzing incidence data. This distribution often underpins estimates of the reproductive number and hence public health strategies. But linking contact-tracing data to the generation interval for modelling purposes is unfortunately not straightforward, and misspecifications can lead to incorrect estimates of the reproductive number \cite{Svensson2007is, Kenah2008il, Tomba2010ig, Nishiura2009ct}
+
+A great deal of work has focused on real-time estimation of key epidemiological quantities, as we propose here. Many of these studies were focused on other pathogens, but their results are highly relevant for Ebola outbreaks. Reproductive numbers have been estimated by fitting compartmental models to observed incidence data (for example \cite{Chowell2004}). An innovative model, based on probable transmission trees was proposed by \cite{Wallinga2004te} and applied to SARS data. Shortly after, \cite{Cauchemez2006ei} extended this model to take into account right-censored incidence data. \cite{Lekone2006ez} designed a statistical model where both process and observation errors are built-in and applied their methodology to the 1995 DRC Ebola outbreak. \cite{Wallinga2007bk} popularized the renewal-equation approach to estimating the effective reproductive number, and \cite{ForsbergWhite2008iy} estimated reproductive numbers by assuming Poisson-distributed secondary cases and a generation interval following a multinomial distribution. \cite{Bettencourt2008iv} used sequential Bayesian estimation to infer the effective reproductive number from influenza incidence data. \cite{Nishiura2009ct} investigated the relationship between reporting interval and inferred reproductive numbers, and \cite{Cori2014ia} developed an analytic approach which model was used in the WHO projections \cite{Ebola2014d} for the West Africa Ebola epidemic. More recently, \cite{King2015kb} highlighted that using deterministic models fit to cumulative incidence can bias parameter inference, leading to biased forecasts.
+
+None of the methodological models above included delayed or under-reporting, but it is worth noting these issues have been investigated in epidemiological models since the early 1990s (e.g., \cite{Brookmeyer1990uc, Lawless1994tq} and is still a field of active research \cite{Azmon2013bh, Noufaily2015vl}.
+
+We aim to combine and extend previous studies into modeling frameworks and numerical tools with the goal of a making a product of higher quality than the sum of its components.
+
+\section{Research plan}
+
+\subsubsection{Reliable estimation of the reproductive number}
+
+The generation interval is the time between the moment a person is infected and the moment that person infects another. Understanding generation-interval distributions is critical to interpreting disease spread, because this distribution provides the link between the population-level rate of spread and the reproductive number \cite{Wallinga2007bk}, and many public health decisions are based on reproductive number estimates.
+
+Estimating the generation interval during the exponential phase of an outbreak is challenging, because information is usually limited, and because observed generation intervals are typically biased toward shorter intervals. This is because of ``right-censoring'' at the time of measurement: longer generation intervals in recent cases are less likely to have ended and thus are less likely to be observed.  When the epidemic is growing exponentially, a relatively large proportion of total cases will be recent, and this bias can be severe, leading in turn to systematic bias which leads to under-estimation of the reproductive number.  Estimates made during the West Africa Ebola epidemic did not systematically address this bias, and in fact there is ongoing theoretical consideration of how observed generation intervals evolve during an outbreak \cite{Tomba2010ig, Nishiura2009ct}. The question of generation intervals is particularly of interest in Ebola, because it could be substantially affected by the fraction of transmission happens in the context of burials, which is difficult to estimate, and a key focus of interventions.
+
+We have made theoretical progress (see below) in understanding how observed generation intervals relate to the dynamics of disease spread, and in outlining qualitatively how the variance of the generation-interval affects the relationship between the rate of spread and the reproductive number. Generation interval estimates are often based on observed serial intervals: the time between symptom onset, rather than infection, of an infector and a corresponding infectee. These distributions are often used as a proxy for generation intervals because symptom onset is typically easier to observe than infection. Theory suggests that serial intervals should in many cases be similar to generation intervals, but they are not the same. When serial intervals are measured, the problem of estimating generation intervals in a changing epidemic is compounded by the problem of understanding the relationship between generation interval and epidemic dynamics.
+
+\paragraph*{Preliminary research:}
+
+We have examined the relationship between three different types of generation interval. The intrinsic generation interval represents the underlying infectiousness of an average individual during the course of the infectious period, independent of what is happening at the population level. This is the generation interval used for inferring the reproductive number in mathematical and statistical models; it is not directly observed. The forward generation interval starts with the cohort infected during a specific time period, and looks forward to examine the time distribution of when they will infect others. The backward generation interval starts with the same cohort and looks backward to ask when the individuals who infected them were themselves infected.
+
+The forward and backward intervals typically do not match the intrinsic intervals, even in theory. In particular, during the exponential outbreak phase, the backward generation interval is shorter than the intrinsic interval, because a large proportion of infectious individuals were infected relatively recently, and they are correspondingly more likely to infect a given susceptible. We have shown that we can mathematically explain expected differences between the intrinsic interval and the backward and forward intervals in terms of changes in population-level outbreak phase (e.g., exponential growth, peaking, decline), and confirmed these calculations by simulation (see Figure 2 in the supplement). Our work synthesizes and extends previous studies on this topic \cite{Svensson2007is, Kenah2008il, Tomba2010ig, Nishiura2009ct}
+
+Linking the rate of spread to the reproductive number requires the shape of the generation-interval distribution, not just the mean. Estimating the shape from limited or noisy data is substantially more difficult than estimating mean and variance, and it is common to assume a gamma distribution \cite{Ebola2014d}. We have derived a more flexible  approximation, and used it to show (using simulations) that the mean generation interval alone is not sufficient for accurate estimation, but that (at least for parameters relevant to the West Africa Ebola epidemic), the mean and variance together provide almost as much information as accurate knowledge of a true, realistic generation interval. These findings leverage mathematical theory to show that we can in general build reliable tools to estimate the reproductive number without detailed information on the shape of the generation interval.
+
+\paragraph*{Proposed research:}
+
+We will extend our theoretical work on generation intervals to develop a statistical methodology for estimating the mean and variance of the intrinsic generation-interval distribution during a growing epidemic. We will validate this methodology by realistic simulations (see below), and then apply  it to available data from the Ebola epidemic.
+
+We will test our existing moment approximations against various assumptions about the distribution of the generation interval, in particular investigating the effect of burial transmission on generation-interval distributions and thus on the relationship between rate of spread and reproductive number. In addition to the mean generation interval, our current approximations (see Figure 3 in the supplement) use a single shape parameter (the variance).  We will develop criteria for when a single shape parameter is expected to be insufficient for useful approximations, and develop higher-order moment approximations, and estimation methods for these higher moments. The higher-order methods will also be validated against simulated data.
+
+We will also extend this work, first theoretically and then empirically, to address the question of using serial-interval measurements to estimate the generation-interval distribution. This work will consider the possibility that the length of the incubation period is correlated with the time profile of infectiousness in individuals. These relationships are simpler in diseases like Ebola, where symptom onset always precedes infectiousness, but we will use a general approach that can be extended to consider diseases where this is not the case.
+
+\paragraph*{Challenges:}
+
+A challenge will be to develop a framework that can deal with observations of potentially infectious contacts, instead of known infection events (or observed serial intervals). In other words, it may be difficult to infer which contact caused infection in many cases. Addressing this will require fitting a generation-interval model while using latent variables to represent the various possibilities for the true chains of infection. We will use to characterize when it is practical to make such inferences while also accounting for data censoring in the exponential phase of the epidemic.
+
+\subsubsection{Improving estimation of the reproductive number}
+
+Modelers produced an impressive array of models, and fits to data, during the early stages of the West Africa Ebola epidemic. But these models took different factors and different sources of error into account. Our goal is to produce theory, algorithms and a shareable software package that will make it possible for modelers in the next epidemic to combine information, and associated uncertainty arising from the following key sources:
+
+\begin{itemize}
+
+\item generation-interval estimation
+
+\item imperfect case reporting
+
+\item the intrinsic stochasticity of disease spread
+
+\end{itemize}
+
+while still accommodating a variety of model structures, in particular including the possibility of sub-clinical infections \cite{BellPull14Asymp} and of burial transmission \cite{Ebola2014d}.
+
+\paragraph*{Preliminary research:}
+
+We have extensively explored fits that combine imperfect case reporting with intrinsic disease stochasticity (but not with generation-interval uncertainty). Much of this work is still in progress (see Figure 4 in the supplement), but it informed our published work on asymptomatic immunity \cite{BellPull14Asymp}.
+
+We have investigated the effects of generation-interval uncertainty arising from estimates of the importance of burial transmission in the West Africa Ebola epidemic. Recently published work (see Figure 5 in the supplement) focused specifically on the effect of generation intervals \cite{WeitDush15}, while ongoing work integrates this with estimates of uncertainty arising from case reporting and stochastic disease spread \cite{TaylorPoster}.
+
+We have also done a review of published models that estimate the reproductive number early in an outbreak from incidence data \cite{ChampredonPoster}. We implemented many of these models, using either published code or our own reconstructions (see Figure 6 in the supplement).
+
+\paragraph*{Proposed research:}
+
+Guided where possible by our theoretical findings above, we will construct and test models that combine uncertain information about generation intervals and rates of disease spread and estimate disease parameters while propagating uncertainty. The models will simultaneously estimate the likelihood of observed incidence time series and observed generation intervals, using latent variables for underlying true patterns of infectivity, and for true total numbers of disease cases. This will enable us to account for uncertainty arising from imperfect observation, and from stochasticity in the disease process. Estimation will require a fast fitting-to-data method. We will probe advanced techniques for either likelihood based estimations (e.g., iterated filtering) or Bayesian estimates (e.g. Markov Chain Monte-Carlo). The goal will be to find a method that can reliably converge to the known desired answer when confronted with simulation models -- including simulation models which do not exactly match the model assumptions.
+
+Although our final goal is to learn from past outbreaks and prepare to analyze future outbreaks in real time, simulated data will play a critical role, particularly in this aim. We will use simulated data in developing, validating and challenging models. Real outbreak data is limited in quantity, and underlying mechanisms are imperfectly known. Even when satisfactory fits and explanations can be obtained, it is impossible to be sure that conclusions are correct and, crucially, impossible to validate methodological robustness: would the approach that we (retrospectively) believe could have produced the right answer for this outbreak be likely to produce the right answer for a future outbreak? We will develop simulation models with a broad range of complexity and use these simulated data set to:
+
+\begin{itemize}
+
+\item validate models, by simulating data following the model assumptions -- models are validated if they are approximately unbiased, and if the known true value falls within estimated 95\% confidence intervals approximately 95\% of the time
+
+\item evaluate model sensitivity by simulating data sets with various characteristics
+
+\item evaluate model robustness by simulating processes not reflected in the assumptions of the inference model
+
+\end{itemize}
+
+The tools for generating synthetic outbreaks will be part of our packaged deliverables.
+
+\paragraph*{Challenges:}
+
+Building simulation models, and constructing and validating likelihoods, should be relatively easy. The main challenge here is putting the models in frameworks where estimates can be made in a reasonable period of time, and where fits can be validated intrinsically. Although the availability of simulation models for validation will be tremendously helpful, we also need tools that will allow us to tell when a model has converged to a reliable answer based on the model fit itself -- otherwise, we will be unable to fit real data with confidence. We intend to attack this difficult problem from a variety of angles: all of the models outlined above have advantages and disadvantages, and we are committed to finding an approach, or combination, that will provide reliable fits. Our team has extensive experience with both Bayesian and frequentist approaches, both using software packages (e.g., pomp, jags, mc-stan) and writing our own code (in a variety of languages, including scientific computing standards R, Python, and C++).
+
+\subsubsection{Accounting for surveillance effort, coverage and biases}
+
+In many outbreaks, initial case reporting comes in fits and starts. A number of factors underlie this, including: increasing recognition of the disease by physicians, health officials and the public; active case-finding and report-seeking by public-health officials; correcting of errors; problems with the public-health communications pipeline; and in some cases a desire to minimize concern.
+
+The proposed research will seek to develop methods of simultaneously making inferences about the case-reporting process and the spread of the disease itself, and apply them to retrospective data from the West Africa Ebola epidemic to see what can be learned, and whether it is practical to recommend such methods for future epidemics.
+
+\paragraph*{Proposed research:}
+
+The proposed research will develop simulation models that include detailed mechanisms of how cases are reported, specifically focusing on: changes in diagnostic practice and diagnostic tools; changing reporting proportions; delayed reporting (sometimes with delayed dates attached); and errors and error correction. We will build on the models from Aim 2 above, and explore under what circumstances and assumptions parameters are still identifiable. Inside our model world, we will consider in particular when supplemental information (e.g., laboratory assay data on suspected cases, introduction dates for awareness programs, start dates for policy interventions) is helpful in allowing patterns to be disentangled.
+The research will follow the same patterns as in Aim 2: we will simulate outbreaks for various scenarios, and attack from a variety of angles (building on successful strategies from Aim 2).
+
+\paragraph*{Challenges:}
+
+While potentially important, this is a difficult area. We will start with simple simulations that we expect to be able to analyze, but we don’t know whether we will be able to reliably recapture parameters from more complicated models. The goal therefore is to assess the potential for changes in surveillance effort and reporting irregularities to affect real-time estimates, and explore the extent to which models may be able to account for them.
+
+\subsubsection{Retrospective analysis of the West African Ebola Epidemic}
+
+We will use our estimation package to analyze the West Africa Ebola epidemic, both with the full benefit of hindsight, and in ``virtual real time''. For the virtual real time analysis, we will construct a time series of data sets, each corresponding to information generated by a specific time, which we will then use as input to the assorted forecasting models (and WHO and CDC models or potentially others if open implementations are available) with and without informing the time series with our inference framework. Our intent is not to second guess these modeling efforts, so it will not be necessary to do a detailed reconstruction of who knew what, when and where. The point instead is to see how inferences -- using real modeling approaches embraced by the public health community -- tend to change as information accumulates, and to see how this is affected when we add our framework.
+
+\paragraph*{Proposed research:}
+
+We will two different data sets currently available from WHO, as well as other data that becomes available, to assemble a timeline of approximately what information was available at what time. We will apply our validated models to these time series, with different stopping points, and compare what predictions might have been made, and with what level of certainty, using either our full model (incorporating uncertainty in generation intervals, case observation, and the stochastic spread process), or a simpler model (with uncertainty only in case observation). We will focus primarily on medium-term forecasts, but will also examine estimates of the reproductive number, and probe the link between uncertainties in the components of our model and uncertainties in our forecasts. We will also use our virtual real-time reconstructions to examine signs that our exponential-phase fits are degrading, and ask at what point it might have been possible to say with some confidence that the epidemic was slowing.
+
+We emphasize that the point of this exercise is to ask realistically how better models -- particularly of the observation process, and incorporating propagation of uncertainty -- might help guide future policy decisions.  As such, it is not  necessary to capture anything beyond a rough description of the details of data availability, as no doubt future events will have different levels of misreporting and data availability..  To the extent that we can accurately recreate the historical availability of data (and recognize the value of measuring how we measure in future outbreaks), we can do better at establishing a baseline prior to inform our confidence in forecasts early in future outbreaks.
+
+We will also use current accumulated data to analyze the exponential-phase outbreak with the full benefit of hindsight, and generate parameter estimates that can be used to assess the accuracy of the real-time analysis. We will also look at the full data set and evaluate at what point parameters seem to have changed.
+
+We will also benefit from having data from three different countries which had noticeably different epidemics. This will allow us to validate our approaches using different, realistic, parameter regimes.  If our understanding improves enough, we may also be able to tackle what differentiates these epidemics from the regularly recurring smaller outbreaks in central Africa.
+
+\paragraph*{Challenges:}
+
+Determining when and how parameters are changing will be substantially harder than examining estimates and levels of certainty from the exponential phase. We will address this difficulty adaptively. Once we have fits from the early period, and from simulated data, we will construct simulations that qualitatively match the early real data -- both superficially and in the nature of the fitting output. We will then:
+
+\begin{itemize}
+
+\item develop criteria for detecting parameter change, based on the nature of our fits to early data;
+
+\item extend our realistic simulations, using various assumptions about how parameters change;
+
+\item validate our proposed criteria using simulated data before applying them to the real data
+
+\end{itemize}
+
+\section{Research setting}
+
+Our team has extensive experience with dynamical modeling, statistical modeling, validation by simulation and structuring programming projects. We have worked together on several high-impact projects related to the West Africa Ebola epidemic \cite{BellPull14Asymp,Bellan2014, BellPull15}.
+
+JD and his lab at McMaster have experience in dynamical modeling and statistical fitting, a server cluster that will facilitate collaboration and development, and access to Sharcnet. In addition to co-applicant BB at McMaster, we expect the grant team to interact with members of McMaster's active Institute for Infectious Disease Research (including leading mathematical modeler David Earn, and epidemiologists includine Mark Loeb).
+
+BB is a world-leading statistician who will bring statistical rigor and a depth of knowledge of coding in R to the project.
+
+DC is a late-stage Ph.D. student who has explored a wide range of infectious-disease related questions, and recently finished a reading course and manuscript focused on reviewing state-of-the-art modeling and inference of parameters in exponential-phase infectious diseases
+
+CP is experienced in scientific and engineering programming pipelines, particularly for large scale simulation, in open-source development settings, with an emphasis on replicability 
+JP is an accomplished viral epidemiologist, and will work closely with CP at U.\ Florida.
+
+SB has extensive practical experience in fitting dynamical models to data, and a wide array of tools that will allow him to provide useful advice, particularly to DC, CP and the other PDF.  
+LM is a highly accomplished disease modeler and member of the MIDAS network. She will bring a broad, practical perspective, and will work closely with Bellan at U.\ Texas.
+
+\section{Knowledge translation}
+
+We will share knowledge from this project by publishing papers, by sharing software algorithms and packages, and by disseminating knowledge through an existing training program. with the scientific community by publishing papers in academic journals, including both at mode, We expect to have at least five papers submitted by the end of the grant period, covering a range of journals from a statistical orientation to applied medical and public-health journals.
+
+To support the various aims of this proposal, we expect to produce a large amount of code.  We will package that code into software that is consistent with generally prescribed practices of software industry, which entails a higher standard than typical for scientific development.  That work will be available as a package for the R programming language, for other researchers and policy analysts to use in a turn-key fashion.  Furthermore, the source of that code will be freely available in version control repository, and we will respond to any feature requests, bug reports, {\em etc}.  Given the scope of work for this particular proposal, and the planned future extensions, we expect to continue to extend this curated package for long after the completion of the proposed work.
+
+Four of us (SB, JD, CP and JP) are actively involved in capacity-building training programs in Africa. We anticipate making use of the principles and software products developed under this grant in some of the workshops we run.
+
+\section{Overall contribution}
+
+The primary purpose of our tool is real-time analysis of ongoing epidemics. It is impossible to predict when the next suitable outbreak, whether of Ebola Virus disease or some other pathogen, will occur. However, by the end of the grant period, we intend to be ready to:
+
+\begin{itemize}
+
+\item apply our tools to any data that we are able to access, either publicly or through research agreements
+
+\item share our tools with other research groups, and help any interested group with access to more data than we have to apply them
+
+\item extend our tools to accommodate details novel to the outbreak in question or not previously addressed in our framework
+
+\item encourage and if necessary assist others to modify our tools
+
+\end{itemize}
+
+We expect that our tools will assist in making estimates with realistic levels of uncertainty, and  also some insight into how that uncertainty can be reduced as the epidemic spreads, and by collecting certain kinds of data. This will in turn provide decision-makers with a perspective that can be useful in making real-time response and assessment decisions.
+
+The proposed research promises to: aid in both the theoretical and practical understanding of disease dynamics; build practical tools that can aid in decision making under uncertainty; and lay a foundation for future advances in practical modeling, and in understanding how uncertainty propagates through model results.
+\renewcommand{\refname}{\relax}
+\bibliographystyle{unsrt}
+\newpage
+\ \vspace{-3\baselineskip}
+\bibliography{mendeley}
+% N.B.  To avoid spacing between references in the reference list
+%       the command   \parskip=0pt   must be put inside the .bbl file.
+
+\end{document}

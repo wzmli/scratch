@@ -63,7 +63,7 @@ if (%inputs){
 }
 
 if (%bibs){
-	say "$basename.pdf: $basename.bbl";
+	say "$basename.reqs: $basename.bbl";
 	say "$basename.bbl: " . join " ", keys %bibs, "\n";
 }
 
