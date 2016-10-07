@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: factor.Rout 
+target pngtarget pdftarget vtarget acrtarget pushtarget: step.Rout 
 
 ##################################################################
 
@@ -108,6 +108,9 @@ Archive += tSIR.Rout
 
 ######################################################################
 
+step.deps: step.R
+step.Rout: step.R
+
 ### Makestuff
 
 ## Change this name to download a new version of the makestuff directory
@@ -116,6 +119,7 @@ Archive += tSIR.Rout
 -include $(ms)/git.mk
 -include $(ms)/visual.mk
 
--include $(ms)/wrapR.mk
+# -include $(ms)/wrapR.mk
+-include $(ms)/stepR.mk
 -include $(ms)/oldlatex.mk
 -include $(ms)/pandoc.mk
