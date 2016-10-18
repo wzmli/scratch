@@ -90,7 +90,6 @@ fitpage.sty:
 
 ### Fitting from BB
 
-
 stochSIRsample.pdf: slice2D.R
 
 ##### Orthogonality
@@ -106,7 +105,15 @@ cards.Rout: cards.R
 tSIR.Rout: tSIR.R
 Archive += tSIR.Rout
 
+### Fitting for Alejo http://dushoff.github.io/notebook/genFit.html
+
+genFit.Rout: genFit.R
+
 ######################################################################
+
+## Useful files
+
+Sources += talk.Makefile
 
 step.deps: step.R
 step.Rout: step.R
