@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: step.Rout 
+target pngtarget pdftarget vtarget acrtarget pushtarget: coexistence.html 
 
 ##################################################################
 
@@ -69,6 +69,8 @@ johnson_test.Rout: johnson.Rout johnson_test.R
 johnson.mkd: 
 johnson.html: johnson.rmd 
 johnson.rmd: johnson_test.Rout-0.png johnson_test.Rout-1.png johnson_test.Rout-2.png
+
+coexistence.html: coexistence.mkd
 
 Sources += gavin70.tex
 gavin70.pdf: gavin70.tex

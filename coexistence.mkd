@@ -1,0 +1,19 @@
+---
+layout: page
+title: Quality-based coexistence
+slug: Quality-based coexistence
+---
+
+A coexistence result I found many years ago for Jeremy Lichstein, with help from Joshua Weitz. Fred Adler thinks that Peter Chesson already knows it.
+
+Imagine a patch model where each species produces propagules with a _distribution_ of qualities, and empty patches are filled by the highest-quality propagule that arrives. Such a system has a strong (and maybe surprising) tendency to coexistence, meaning (roughly) that if two species have different seed-quality distributions, but are roughly equally matched, each will invade the other (rather than each excluding the other).
+
+Conceptually, I think this is because each species' quality density is stronger where it is stronger, so that, all else equal, removing conspecifics (making the environment more like the heterospecific environment) is more likely to help a particular individual take over a site than removing heterospecifics would be.
+
+To show the result, I compute the probability of success of an individual trying to invade an established community, and then show that the sum of cross-invasion probabilities for any two distinct species is greater than the sum of self-invasion probabilities.
+
+Imagine a resident species at equilibrium in a patch model. Any given available patch will be subject to a rain of propagules -- let's say $i$ propagules with probability $p_i$. We construct the generating function $P(x) = \sum{p_i x^i}$. 
+
+We now ask about the competitive environment created by this resident. Let $f(s)$ is the pdf of the distribution of seed qualities, with cdf $F(s)$. Then the cdf for the maximum seed quality of a patch with $i$ propagules is given by $F^i$, and the cdf for the competitive environment (maximum seed quality of a random patch under the seed rain) is just $P(F)$, where $P$ is the generating function from the previous paragraph. It's a bit magical that this works seamlessly for the case $i=0$ (equivalent to no competition, which means that those patches should always be measured as part of the cdf (less competitive than whatever seed is trying to invade).
+
+A seed with quality $s$ thus has success probability $P(F(s))$ (the probability that a patch has no seed better than $s$, so if an invader has seed-quality distribution $\hat f(s)$ (cdf $\hat F(s)$), its overall probability of success is $\int P(F(s)) \hat f(s) ds$. For simplicity of manipulation, we rewrite as $\int P(F) d\hat F$.
