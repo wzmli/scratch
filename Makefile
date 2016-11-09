@@ -14,6 +14,14 @@ include stuff.mk
 
 ##################################################################
 
+## Sid Reed
+
+Sources += $(wildcard *.py)
+SIR.out: SIR.py
+	$(PITH)
+
+##################################################################
+
 ## Content
 
 Sources += $(wildcard *.R *.rmd *.mkd)
