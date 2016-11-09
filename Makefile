@@ -2,7 +2,7 @@
 ### Hooks for the editor to set the default target
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: coexistence.html 
+target pngtarget pdftarget vtarget acrtarget pushtarget: SIR.out 
 
 ##################################################################
 
@@ -11,6 +11,7 @@ target pngtarget pdftarget vtarget acrtarget pushtarget: coexistence.html
 Sources = Makefile .gitignore README.md stuff.mk LICENSE.md
 include stuff.mk
 # include $(ms)/perl.def
+include $(ms)/python.def
 
 ##################################################################
 

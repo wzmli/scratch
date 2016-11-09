@@ -51,7 +51,7 @@ def cb_gen(S0, I0, R0, probInf, probRe):
 #cb_gen(20, 5, 7, 0.2, 0.4)
 
 def cb_sim(S0, I0, R0, probSuc, probRec, nmax = 10):
-	"""simulates the chain binomial epidemic model (cb_gen) for nmax generations (10 by default) and returns the number of
+	"""simulates the chain binomial epidemic model (cb_gen) for nmax generations (10 by deafault) and returns the number of
 	infected individuals in each generation in a tuple (IG)"""
 	SG = []
 	IG = []
@@ -65,12 +65,29 @@ def cb_sim(S0, I0, R0, probSuc, probRec, nmax = 10):
 	RG.append(Rnew)
 	for i in range(nmax - 1):
 		Snew, Inew, Rnew = cb_gen(Snew, Inew, Rnew, probSuc, probRec)
+		if Inew == 0:
+			SG.append(Snew)
+			IG.append(Inew)
+			RG.append(Rnew)
+			return tuple(SG), tuple(IG), tuple(RG)
 		SG.append(Snew)
 		IG.append(Inew)
 		RG.append(Rnew)
-		if Inew == 0:
-			return tuple(SG), tuple(IG), tuple(RG)
 	return tuple(SG), tuple(IG), tuple(RG)
+
+def cb_sim_graph(S0 = 2200, I0 = 3, R0 = 5, probInf = 0.1, probRec = 0.1, nmax = 10):
+	'''Uses the cb_sim() function to generate data for one instance of an infection (either 10 generations or until there
+	are 0 infected people. It then plots the number of succeptibles, infected and recovered against the number of generations.
+	It also prints the Y vlaues for each populations
+	'''
+	x, y, z, = cb_sim(S0, I0, R0, probInf, probRec, nmax)
+	print("Susceptible", x,'\n',"Infected  ", y, '\n' "Recovered  ",z)
+	plt.plot( x, 'r--', y, 'g-', z, 'b:')
+	plt.axis([0,len(x),-1,S0+I0+R0])
+	plt.legend(("Succeptible", "Infected", "Recovered"))
+	plt.xlabel("Generations")
+	plt.ylabel("Populations")
+	plt.show()
 
 def update_cb_dict(d,k):
 	"""updates a dictionary d. If key k is already a key, adds one to d[k], if not initializes d[k] = 1"""
@@ -80,8 +97,9 @@ def update_cb_dict(d,k):
 	else:
 		d[(k)] = 1
 
+
 #THIS IS THE FUNCTION I AM HAVING AN ISSUE WITH
-def runSims(Suc = 40, Inf = 2, Rec = 4, ProbI = 0.1, ProbR =0.2, nmax = 10, reps=10000):
+def runSims(Susc = 40, Inf = 2, Rec = 4, ProbI = 0.1, ProbR =0.2, nmax = 10, reps=10000):
 	""" Runs 10000 simulations of the binomial epidemic model using cb_sim() and updates
 	 the dictionaries S1, I1, R1 (using update_cb_dict) with each simulation's tuples of succeptibles, infected and
 	 recovered as a key and the number of occurences as the value. Then the average number of individals for each class
@@ -91,13 +109,17 @@ def runSims(Suc = 40, Inf = 2, Rec = 4, ProbI = 0.1, ProbR =0.2, nmax = 10, reps
 	MeanlistI = []
 	MeanlistR = []
 
+	# This should be a more "logical" loop
+	# for(probiterate=0; probiterate<=1; probiterate+=probStep)
 	while probiterate <= 1.0:
+		print(probiterate)
 		S1 = {}
 		I1 = {}
 		R1 = {}
 		lens, leni, lenr = 0, 0, 0
 		for x in range(reps):
-			a, b, c = cb_sim(Suc, Inf, Rec, probiterate,ProbR, nmax)
+			a, b, c = cb_sim(Susc, Inf, Rec, probiterate,ProbR, nmax)
+			print(a, b, c)
 			update_cb_dict(S1, a)
 			update_cb_dict(I1, b)
 			update_cb_dict(R1, c)
@@ -110,17 +132,29 @@ def runSims(Suc = 40, Inf = 2, Rec = 4, ProbI = 0.1, ProbR =0.2, nmax = 10, reps
 			u = dicts[t]
 			for x in u.keys():
 				for y in x:
-					for i in range(u[x]):
-						temp += y
-						lenses[t] += 1
-			meanlists[t].append(temp / lenses[t])
+					temp += y*u[x]
+					lenses[t] += u[x]
+			meanlists[t].append(1.0*temp / lenses[t])
 
 		SS = np.array(MeanlistS)
 		II = np.array(MeanlistI)
 		RR = np.array(MeanlistR)
 		probiterate += 0.05
 
-	print(SS, II, RR)
+	print(MeanlistS)
+	print(MeanlistI)
+	print(MeanlistR)
+	infectionprobs = np.arange(0,1,0.05)
 
-np.random.seed(233)
+## Not meant to work yet
+def plotSims():
+	plt.figure()
+	plt.plot(infectionprobs, SS, 'r--', infectionprobs, II, 'bo', infectionprobs, RR, 'g^')
+	plt.axis([0,1, -1,(Susc+Inf+Rec)*1.1])
+	plt.legend(("Succeptible", "Infected", "Recovered"))
+	plt.xlabel("Infection Probability")
+	plt.ylabel("Average Succeptible, Infected, Recovered")
+	plt.show()
+
+## np.random.seed(233)
 runSims(reps=20)
