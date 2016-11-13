@@ -4,6 +4,8 @@ use 5.10.0;
 my $top=100;
 my %square;
 my @square;
+my %assoc;
+my %inbred;
 
 for (my $i=1; $i<=$top; $i++){
 	my $ii = $i*$i;
@@ -18,7 +20,23 @@ foreach my $i (@square){
 			next unless $k<$j;
 			my $l = $j + $k - $i;
 			next unless defined $square{$l};
-			say "$i $j $k $l";
+			push @{$assoc{$i+$l}}, $j-$l;
+			push @{$assoc{$i+$l}}, $k-$l;
 		}
 	}
 }
+
+while (my($spawn, $ar) = each(%assoc)){
+	foreach my $i (@${ar}){
+		foreach my $j (@${ar}){
+			next if $i==$j;
+			if (defined $assoc{$i}){
+				foreach my $k (@{$assoc{$i}}){
+					push @{$inbred{$j}}, $i if $k==$j;
+				}
+			}
+		}
+	}
+}
+
+while 

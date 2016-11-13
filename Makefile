@@ -25,7 +25,7 @@ SIR.out: SIR.py
 
 ##################################################################
 
-## Inbred explorations
+## Inbred explorations (Adler)
 
 Sources += inbred.pl
 inbred.out: inbred.pl
