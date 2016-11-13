@@ -1,8 +1,10 @@
 # scratch
-### Hooks for the editor to set the default target
+### Public or private??
+### Location???
+
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: SIR.out 
+target pngtarget pdftarget vtarget acrtarget pushtarget: inbred.out 
 
 ##################################################################
 
@@ -10,7 +12,7 @@ target pngtarget pdftarget vtarget acrtarget pushtarget: SIR.out
 
 Sources = Makefile .gitignore README.md stuff.mk LICENSE.md
 include stuff.mk
-# include $(ms)/perl.def
+include $(ms)/perl.def
 include $(ms)/python.def
 
 ##################################################################
@@ -23,14 +25,15 @@ SIR.out: SIR.py
 
 ##################################################################
 
-## Content
+## Inbred explorations
 
-Sources += $(wildcard *.R *.rmd *.mkd)
-
-tmp/new.Rout: new.R
-	$(run-R)
+Sources += inbred.pl
+inbred.out: inbred.pl
+	$(PUSH)
 
 ##################################################################
+
+Sources += $(wildcard *.R *.rmd *.mkd)
 
 ############ nlme "bug"
 
