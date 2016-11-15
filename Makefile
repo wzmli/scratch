@@ -25,6 +25,12 @@ SIR.out: SIR.py
 
 ##################################################################
 
+## Shapes Bewketu)
+
+add.Rout: add.R
+
+shapes.Rout: shapes.R
+
 ## Inbred explorations (Adler)
 
 Sources += inbred.pl
@@ -140,7 +146,7 @@ step.Rout: step.R
 -include $(ms)/git.mk
 -include $(ms)/visual.mk
 
-# -include $(ms)/wrapR.mk
--include $(ms)/stepR.mk
+-include $(ms)/wrapR.mk
+# -include $(ms)/stepR.mk
 -include $(ms)/oldlatex.mk
 -include $(ms)/pandoc.mk

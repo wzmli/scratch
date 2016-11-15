@@ -33,10 +33,9 @@ while (my($spawn, $ar) = each(%assoc)){
 			if (defined $assoc{$i}){
 				foreach my $k (@{$assoc{$i}}){
 					push @{$inbred{$j}}, $i if $k==$j;
+					say "$j $i ($spawn)" if $k==$j;
 				}
 			}
 		}
 	}
 }
-
-while 
