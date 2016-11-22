@@ -4,7 +4,7 @@
 
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: inbred.out 
+target pngtarget pdftarget vtarget acrtarget pushtarget: SIR.out 
 
 ##################################################################
 

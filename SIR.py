@@ -1,160 +1,378 @@
 import numpy as np
 import numpy.random as npr
 import matplotlib.pyplot as plt
-
-#No Vital Dynamics
+import time
 
 def infectionrate(S0, probI):
-	"""takes a probability(probS) in decimal form and finds the distribution of states over TotalPop
-	random trials (the chain binomial), return the number of S individuals at a given infection prob
-	after infection is allowed to occur"""
-	inf = 0
-	for x in range(S0):
-		bi = npr.uniform(0, 1)
-		if bi < probI:
-			inf += 1
-		else:
-			inf += 0
-	return inf
+    ''' using the amount of infected and the recovery probability it calculates the amount of people that recover from
+    the infection
+    :param S0: succeptible population
+    :param probI: infection probability
+    :return: integer of infected individuals
+    '''
+    if probI < 0:
+        raise ValueError("Cannot have negative probability")
+    inf = 0
+    for x in range(S0):
+        bi = npr.uniform(0, 1)
+        if bi < probI:
+            inf += 1
+        else:
+            inf += 0
+    return inf
 
 def recoveryrate(I0, probR):
-	""" using the amount of infected it calculates the amount of people that recover from
-	the infection
-	:param IR: infected population
-	:param probR: recovery probability
-	:return: recovered individuals
-	"""
-	rec = 0
-	for x in range(I0):
-		bi = npr.uniform(0, 1)
-		if bi < probR:
-			rec += 1
-		else:
-			rec += 0
-	return rec
+    ''' using the amount of infected and the recovery probability it calculates the amount of people that recover from
+    the infection
+    :param I0: infected population
+    :param probR: recovery probability
+    :return: integer of recovered individuals
+    '''
+    if probR < 0:
+        raise ValueError("Cannot have negative probability")
+    rec = 0
+    for x in range(I0):
+        bi = npr.uniform(0, 1)
+        if bi < probR:
+            rec += 1
+        else:
+            rec += 0
+    return rec
+
+
+
+
+
+
+
+
+
+
+
+def cb_gen_nochain(S0, I0, R0, probInf, probRe):
+    '''find the number of infected and succeptible individuals in a population over 1 generation under
+    the chain binomial epidemic model given a probability of infection(prob), the initial number of
+     succeptible individuals(S)and the initial number of infected individuals (I0). It returns
+     the new number of succeptible and infected individuals.
+    :param S0:  Initial number of succeptibles individuals
+    :param I0: Initial number of infected individuals
+    :param R0: Initial number of recovered individuals
+    :param probInf: probability that someone will move from the succeptible class to the infected class
+    :param probRe: probability that someone will move from the infected class to the recovered class
+    :return: three integers, the number of succeptibles, infected and recovered respectively
+    '''
+    new_S = S0 - infectionrate(S0, probInf)
+    new_R = recoveryrate(I0, probRe) + R0
+    new_I = I0 + S0 - new_S - new_R + R0
+    if new_I + new_S + new_R != S0 + I0 + R0:
+        raise ValueError
+    return new_S, new_I, new_R
+
+def cb_sim_nochain(S0, I0, R0, probInf, probRec, nmax):
+    '''runs a simulation of nmax generation with constant infection probability using cb_gen_nochain()
+    :param S0: Initial number of succeptibles individuals
+    :param I0: Initial number of infected individuals
+    :param R0: Initial number of recovered individuals
+    :param probInf: probability that someone will move from the succeptible class to the infected class
+    :param probRec: probability that someone will move from the infected class to the recovered class
+    :param nmax: the number of generations to run, if the number of infected does not reach zero beforehand
+    :return: three tuples, each containing the number of individuals in each class at each generation
+    '''
+    SG = []
+    IG = []
+    RG = []
+    SG.append(S0)
+    IG.append(I0)
+    RG.append(R0)
+    Snew, Inew, Rnew = cb_gen_nochain(S0, I0, R0, probInf, probRec)
+    SG.append(Snew)
+    IG.append(Inew)
+    RG.append(Rnew)
+    for i in range(nmax - 1):
+        Snew, Inew, Rnew = cb_gen_nochain(Snew, Inew, Rnew, probInf, probRec)
+        if Inew == 0:
+            SG.append(Snew)
+            IG.append(Inew)
+            RG.append(Rnew)
+            return tuple(SG), tuple(IG), tuple(RG)
+        SG.append(Snew)
+        IG.append(Inew)
+        RG.append(Rnew)
+    return tuple(SG), tuple(IG), tuple(RG)
+
+
+def cb_sim_graph_constantInf(S0 = 1997, I0 = 3, R0 = 0, probInf = 0.05, probRec = 0.05, nmax = 100):
+    '''Uses the cb_sim_nochain() function to generate data for one instance of an infection (either 400 generations or until there
+    are 0 infected people. It then plots the percentage of succeptibles, infected and recovered against the number of generations.
+    :param S0: Initial number of succeptibles individuals
+    :param I0: Initial number of infected individuals
+    :param R0: Initial number of recovered individuals
+    :param probInf: probability that someone will move from the succeptible class to the infected class
+    :param probRec: probability that someone will move from the infected class to the recovered class
+    :param nmax: the number of generations to run, if the number of infected does not reach zero beforehand
+    :return: a graph of the percentage of the population in each class over time
+    '''
+    susc, infs, recov, = cb_sim_nochain(S0, I0, R0, probInf, probRec, nmax)
+    resultlist = [susc, infs, recov]
+    suscnew, infsnew, recovnew = [], [], []
+    news = [suscnew, infsnew, recovnew]
+    for new in range(3):
+        resultselect = resultlist[new]
+        newsselected = news[new]
+        for element in resultselect:
+            newsselected.append((element/(S0+I0+R0))*100)
+    if len(suscnew) != len(infsnew) or len(suscnew) != len(recovnew) or len(infsnew) != len(recovnew):
+        raise ValueError("Classes are of different generation sizes")
+    plt.plot(suscnew,'r--', infsnew, 'g-', recovnew, 'b:')
+    plt.axis([0,len(suscnew),0,100])
+    totpop = S0+I0+R0
+    plt.suptitle("SIR Model of a Population of Size %i" %totpop, fontsize=16)
+    plt.title("Infection Rate is Constant", fontsize = 12)
+    plt.legend(("Succeptible", "Infected", "Recovered"))
+    plt.xlabel("Generations")
+    plt.ylabel("Percentage of Population in Each Class")
+    plt.show()
+
+
+
+
+
+
+
+
+
 
 def cb_gen(S0, I0, R0, probInf, probRe):
-	"""find the number of infected and succeptible individuals in a population over 1 generation under
-	the chain binomial epidemic model given a probability of infection(prob), the initial number of
-	 succeptible individuals(S)and the initial number of infected individuals (I0). It returns
-	 the new number of succeptible and infected individuals."""
+    '''find the number of infected and succeptible individuals in a population over 1 generation under
+    the chain binomial epidemic model, where infection probability vaires with the number of infected individuals
+    based on the equation:
+    Infection Probability = 1 - (1 - Infection Probability)^(initial number of infected)
+    :param S0:  Initial number of succeptibles individuals
+    :param I0: Initial number of infected individuals
+    :param R0: Initial number of recovered individuals
+    :param probInf: probability that someone will move from the succeptible class to the infected class
+    :param probRe: probability that someone will move from the infected class to the recovered class
+    :return: three integers, the number of succeptibles, infected and recovered respectively
+    '''
+    PI = 1- (1 - probInf) ** (I0)
+    new_S = S0 - infectionrate(S0, PI)
+    new_R = recoveryrate(I0, probRe) + R0
+    new_I = I0 + S0 - new_S - new_R + R0
+    if new_I + new_S + new_R != S0 + I0 + R0:
+        raise ValueError
+    return new_S, new_I, new_R
 
-	PI = 1- (1 - probInf) ** (I0)
-	PR = 1- (1 - probRe) ** (R0)
-	new_S = S0 - infectionrate(S0, PI)
-	new_R = recoveryrate(I0, PR) + R0
-	new_I = I0 + S0 - new_S - new_R + R0
-	if new_I + new_S + new_R != S0 + I0 + R0:
-		raise ValueError
-	return new_S, new_I, new_R
+def cb_sim(S0, I0, R0, probSuc, probRec, nmax):
+    '''runs a simulation of nmax generation with constant infection probability using cb_gen()
+    :param S0: Initial number of succeptibles individuals
+    :param I0: Initial number of infected individuals
+    :param R0: Initial number of recovered individuals
+    :param probInf: probability that someone will move from the succeptible class to the infected class
+    :param probRec: probability that someone will move from the infected class to the recovered class
+    :param nmax: the number of generations to run, if the number of infected does not reach zero beforehand
+    :return: three tuples, each containing the number of individuals in each class at each generation
+    '''
+    SG = []
+    IG = []
+    RG = []
+    SG.append(S0)
+    IG.append(I0)
+    RG.append(R0)
+    Snew, Inew, Rnew = cb_gen(S0, I0, R0, probSuc, probRec)
+    SG.append(Snew)
+    IG.append(Inew)
+    RG.append(Rnew)
+    for i in range(nmax - 1):
+        Snew, Inew, Rnew = cb_gen(Snew, Inew, Rnew, probSuc, probRec)
+        if Inew == 0:
+            SG.append(Snew)
+            IG.append(Inew)
+            RG.append(Rnew)
+            return tuple(SG), tuple(IG), tuple(RG)
+        SG.append(Snew)
+        IG.append(Inew)
+        RG.append(Rnew)
+    return tuple(SG), tuple(IG), tuple(RG)
 
-#cb_gen(20, 5, 7, 0.2, 0.4)
+def cb_sim_graph_chainbinomial(S0 = 1997, I0 = 3, R0 = 0, probInf = 0.05, probRec = 0.05, nmax = 100):
+    '''Uses the cb_sim() function to generate data for one instance of an infection (either 400 generations
+    or until there are 0 infected people. It then plots the percentage of succeptibles, infected and recovered
+    against the number of generations.
+    :param S0: Initial number of succeptibles individuals
+    :param I0: Initial number of infected individuals
+    :param R0: Initial number of recovered individuals
+    :param probInf: probability that someone will move from the succeptible class to the infected class
+    :param probRec: probability that someone will move from the infected class to the recovered class
+    :param nmax: the number of generations to run, if the number of infected does not reach zero beforehand
+    :return: a graph of the percentage of the population in each class over time
+    '''
+    susc, infs, recov, = cb_sim(S0, I0, R0, probInf, probRec, nmax)
+    resultlist = [susc, infs, recov]
+    suscnew, infsnew, recovnew = [], [], []
+    news = [suscnew, infsnew, recovnew]
+    for new in range(3):
+        resultselect = resultlist[new]
+        newsselected = news[new]
+        for element in resultselect:
+            newsselected.append((element/(S0+I0+R0))*100)
+    if len(suscnew) != len(infsnew) or len(suscnew) != len(recovnew) or len(infsnew) != len(recovnew):
+        raise ValueError("Classes have different generation sizes")
+    plt.figure(2)
+    plt.plot(suscnew,'r--', infsnew, 'g-', recovnew, 'b:')
+    plt.axis([0,len(suscnew),0,100])
+    totpop = S0+I0+R0
+    plt.suptitle("SIR Model of a Population of Size %i" %totpop, fontsize=16)
+    plt.title("Infection Rate During Each Generation Varies With the Number of Infected", fontsize=12)
+    plt.legend(("Succeptible", "Infected", "Recovered"))
+    plt.xlabel("Generations")
+    plt.ylabel("Percentage of Population in Each Class")
+    plt.show()
 
-def cb_sim(S0, I0, R0, probSuc, probRec, nmax = 10):
-	"""simulates the chain binomial epidemic model (cb_gen) for nmax generations (10 by deafault) and returns the number of
-	infected individuals in each generation in a tuple (IG)"""
-	SG = []
-	IG = []
-	RG = []
-	SG.append(S0)
-	IG.append(I0)
-	RG.append(R0)
-	Snew, Inew, Rnew = cb_gen(S0, I0, R0, probSuc, probRec)
-	SG.append(Snew)
-	IG.append(Inew)
-	RG.append(Rnew)
-	for i in range(nmax - 1):
-		Snew, Inew, Rnew = cb_gen(Snew, Inew, Rnew, probSuc, probRec)
-		if Inew == 0:
-			SG.append(Snew)
-			IG.append(Inew)
-			RG.append(Rnew)
-			return tuple(SG), tuple(IG), tuple(RG)
-		SG.append(Snew)
-		IG.append(Inew)
-		RG.append(Rnew)
-	return tuple(SG), tuple(IG), tuple(RG)
 
-def cb_sim_graph(S0 = 2200, I0 = 3, R0 = 5, probInf = 0.1, probRec = 0.1, nmax = 10):
-	'''Uses the cb_sim() function to generate data for one instance of an infection (either 10 generations or until there
-	are 0 infected people. It then plots the number of succeptibles, infected and recovered against the number of generations.
-	It also prints the Y vlaues for each populations
-	'''
-	x, y, z, = cb_sim(S0, I0, R0, probInf, probRec, nmax)
-	print("Susceptible", x,'\n',"Infected  ", y, '\n' "Recovered  ",z)
-	plt.plot( x, 'r--', y, 'g-', z, 'b:')
-	plt.axis([0,len(x),-1,S0+I0+R0])
-	plt.legend(("Succeptible", "Infected", "Recovered"))
-	plt.xlabel("Generations")
-	plt.ylabel("Populations")
-	plt.show()
+
+
+
+
+
+
+
+
+
+
 
 def update_cb_dict(d,k):
-	"""updates a dictionary d. If key k is already a key, adds one to d[k], if not initializes d[k] = 1"""
-	#for z in (k):
-	if k in d:
-		d[(k)] += 1
-	else:
-		d[(k)] = 1
+    '''updates a dictionary d. If key k is already a key, adds one to d[k], if not initializes d[k] = 1
+    :param d: dictionary
+    :param k: iterable
+    :return: dictionary with keys that are elements of k
+    '''
+
+    if k in d:
+        d[(k)] += 1
+    else:
+        d[(k)] = 1
+
+def run10kM4(succeptible, infected, recovered, recoveryprob, infectionprobmax, infectionprobstep, gens,sims):
+    '''
+    :param succeptible: initial number of succeptible individuals
+    :param infected: initial number of infected individuals
+    :param recovered: initial number of recovered individuals
+    :param recoveryprob: probability of recovery for an infected individuals
+    :param infectionprobmax: the maximum infection probability being tested
+    :param infectionprobstep: how much the infection probabilty is being incremented
+    :param gens: maximum number of generations being run
+    :param sims: number of simulations to run at each infection probability
+    :return: array of the average epidemic size over sims simulations at each infection proability
+    '''
+    probiterate = infectionprobstep
+    averageepidemicsizes = []
+    while probiterate <= infectionprobmax:
+        recoveredgenerations = {}
+        for n in range(sims):
+            a, b, c = cb_sim(succeptible, infected, recovered, probiterate, recoveryprob, gens)
+            update_cb_dict(recoveredgenerations, c)
+        # print(succeptiblegenerations, '\n', max(succeptiblegenerations.values()))
+
+        individualepidemicsize = 0
+        for key in recoveredgenerations.keys():
+            individualepidemicsize += (key[-1] - key[0]-infected)*(recoveredgenerations[key]/sims)
+        averageepidemicsizes.append(individualepidemicsize)
+        probiterate += infectionprobstep
+
+    averageepidemicsizes = np.array(averageepidemicsizes)
+    print("array of the average epidemic size for each infection probability", '\n', averageepidemicsizes, '\n', len(averageepidemicsizes))
+    return averageepidemicsizes
 
 
-#THIS IS THE FUNCTION I AM HAVING AN ISSUE WITH
-def runSims(Susc = 40, Inf = 2, Rec = 4, ProbI = 0.1, ProbR =0.2, nmax = 10, reps=10000):
-	""" Runs 10000 simulations of the binomial epidemic model using cb_sim() and updates
-	 the dictionaries S1, I1, R1 (using update_cb_dict) with each simulation's tuples of succeptibles, infected and
-	 recovered as a key and the number of occurences as the value. Then the average number of individals for each class
-	  of individuals"""
-	probiterate = 0
-	MeanlistS = []
-	MeanlistI = []
-	MeanlistR = []
+def run10kM4plot(succeptible, infected, recovered, recoveryprob, infectionprobmax, infectionprobstep, gens,sims):
+    '''
+    :param succeptible: initial number of succeptible individuals
+    :param infected: initial number of infected individuals
+    :param recovered: initial number of recovered individuals
+    :param recoveryprob: probability of recovery for an infected individuals
+    :param infectionprobmax: the maximum infection probability being tested
+    :param infectionprobstep: how much the infection probabilty is being incremented
+    :param gens: maximum number of generations being run
+    :param sims: number of simulations to run at each infection probability
+    :return: scatter plot and bar graph of the average epidemic size for each infection probability
+    '''
+    if (infectionprobmax*10e5)%(infectionprobstep*10e5) != 0:
+        print(infectionprobmax%infectionprobstep)
+        raise ValueError("cannot step through probabilites properly, make sure infectionprobstep equally divides infectionprobmax")
 
-	# This should be a more "logical" loop
-	# for(probiterate=0; probiterate<=1; probiterate+=probStep)
-	while probiterate <= 1.0:
-		print(probiterate)
-		S1 = {}
-		I1 = {}
-		R1 = {}
-		lens, leni, lenr = 0, 0, 0
-		for x in range(reps):
-			a, b, c = cb_sim(Susc, Inf, Rec, probiterate,ProbR, nmax)
-			print(a, b, c)
-			update_cb_dict(S1, a)
-			update_cb_dict(I1, b)
-			update_cb_dict(R1, c)
+    infectionprobs = np.arange(infectionprobstep, infectionprobmax+infectionprobstep/2, infectionprobstep)
+    epidemicsizes = run10kM4(succeptible, infected, recovered, recoveryprob, infectionprobmax+infectionprobstep/2, infectionprobstep, gens,sims)
+    print("Infection probabilities", '\n', infectionprobs, '\n', len(infectionprobs))
+    tenpercentgraphspace = (max(epidemicsizes) - min(epidemicsizes))/10
+    totalpopulation = succeptible+infected+recovered
 
-		temp = 0
-		lenses = [lens, leni, lenr]
-		dicts = [S1, I1, R1]
-		meanlists = [MeanlistS, MeanlistI, MeanlistR]
-		for t in range(3):
-			u = dicts[t]
-			for x in u.keys():
-				for y in x:
-					temp += y*u[x]
-					lenses[t] += u[x]
-			meanlists[t].append(1.0*temp / lenses[t])
+    plt.figure(3)
+    plt.scatter(infectionprobs, epidemicsizes)
+    plt.axis([0,infectionprobmax+infectionprobstep, min(epidemicsizes) - tenpercentgraphspace,max(epidemicsizes)+tenpercentgraphspace])
+    plt.xticks(infectionprobs)
+    plt.suptitle("SIR Average Epidemic Size for Multiple Infection Probabilities In a Population of Size %i" %totalpopulation)
+    plt.xlabel("Infection Probability")
+    plt.ylabel("Average Epidemic Size Over %i Simulations" %sims)
 
-		SS = np.array(MeanlistS)
-		II = np.array(MeanlistI)
-		RR = np.array(MeanlistR)
-		probiterate += 0.05
+    plt.figure(4)
+    plt.bar(infectionprobs, epidemicsizes, width=infectionprobstep)
+    plt.axis([infectionprobstep,infectionprobmax+infectionprobstep, min(epidemicsizes) - tenpercentgraphspace,max(epidemicsizes)+tenpercentgraphspace])
+    plt.xticks(infectionprobs)
+    plt.suptitle("SIR Average Epidemic Size for Multiple Infection Probabilities In a Population of Size %i" %totalpopulation)
+    plt.xlabel("Infection Probability")
+    plt.ylabel("Average Epidemic Size Over %i Simulations" %sims)
+    plt.show()
 
-	print(MeanlistS)
-	print(MeanlistI)
-	print(MeanlistR)
-	infectionprobs = np.arange(0,1,0.05)
 
-## Not meant to work yet
-def plotSims():
-	plt.figure()
-	plt.plot(infectionprobs, SS, 'r--', infectionprobs, II, 'bo', infectionprobs, RR, 'g^')
-	plt.axis([0,1, -1,(Susc+Inf+Rec)*1.1])
-	plt.legend(("Succeptible", "Infected", "Recovered"))
-	plt.xlabel("Infection Probability")
-	plt.ylabel("Average Succeptible, Infected, Recovered")
-	plt.show()
 
-## np.random.seed(233)
-runSims(reps=20)
+cb_sim_graph_constantInf()
+
+cb_sim_graph_chainbinomial()
+
+
+
+
+# run10kM4plot(199,1,0,0.3,0.5,0.02, 10,100)
+
+
+
+
+
+
+
+
+
+
+
+# def runmeaninfectionnumber(succeptible, infected, recovered, recoveryprob, infectionprobmax, infectionprobstep, gens,sims):
+#     Meanlist = []
+#     totalinfectionnumber = 0
+#     probiterate = infectionprobstep
+#     while probiterate <= infectionprobmax:
+#         for sim in range(sims):
+#             nouse, infecteds, nouse2 = cb_sim(succeptible, infected, recovered, probiterate, recoveryprob, gens)
+#             for inf in infecteds:
+#                 totalinfectionnumber += inf
+#         Meanlist.append(totalinfectionnumber/(sims*len(infecteds)))
+#         totalinfectionnumber = 0
+#         probiterate += infectionprobstep
+#     return Meanlist
+#
+# def runmeaninfectionnumberplot(succeptible, infected, recovered, recoveryprob, infectionprobmax, infectionprobstep, gens,sims):
+#     means = runmeaninfectionnumber(succeptible, infected, recovered, recoveryprob, infectionprobmax, infectionprobstep, gens,sims)
+#     print(means, '\n', len(means))
+#     infectionprobs = np.arange(infectionprobstep, infectionprobmax+infectionprobstep/2, infectionprobstep)
+#     print(infectionprobs, '\n', len(infectionprobs))
+#     tenpercentgraphspace = (max(means) - min(means))/10
+#     totalpopulation = succeptible+infected+recovered
+#
+#     fig = plt.figure(5)
+#     plt.scatter(infectionprobs, means)
+#     plt.axis([infectionprobstep,infectionprobmax+infectionprobstep, min(means) - tenpercentgraphspace,max(means)+tenpercentgraphspace])
+#     plt.xticks(infectionprobs)
+#     plt.xlabel("Infection Probability")
+#     plt.ylabel("Mean Infection Number Over Infection Period")
+#     fig.suptitle("Mean Infection Number at Multiple Infection Probabilities in a Population of %i" %totalpopulation)
+#     plt.show()
+#
+# runmeaninfectionnumberplot(199,1,0,0.3,1.0,0.02, 10,100)
