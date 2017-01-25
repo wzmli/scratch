@@ -4,7 +4,7 @@
 
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: SIR.out 
+target pngtarget pdftarget vtarget acrtarget pushtarget: redundancy.Rout 
 
 ##################################################################
 
@@ -112,11 +112,32 @@ fitpage.sty:
 
 stochSIRsample.pdf: slice2D.R
 
+######################################################################
+
 ##### Orthogonality
 
+### This is just lm, for reference I guess
+lm.Rout: lm.R
+
+### We can do lm manually, and were beginning to play with qr, which we will use for orthogonalizaiton
 ortho.Rout: ortho.R
 
-lm.Rout: lm.R
+##### model matrix manipulation in clmm (for Tanzania)
+
+### What does the ordinal function look like?
+### Why do we care?
+ordinal.Rout: ordinal.R
+
+## Make some data with structural redundancy
+tzdata.Rout: tzdata.R
+
+## Fit it in different ways
+redundancy.Rout: tzdata.Rout redundancy.R
+
+######################################################################
+
+### WTF is this? ###
+
 dplyr.Rout: dplyr.R
 
 #### tSIR (move to cards/ subdirectory!)

@@ -24,9 +24,9 @@ x <- rnorm(n)
 y <- rnorm(n)
 z <- rnorm(n)
 
-# lmnew(z~1)
+lmnew(z~1)
 om <- lmnew(z~x+y)
-print(cov(om))
+print(vcov(om))
 
 # lmnew(z~x*y)
 
