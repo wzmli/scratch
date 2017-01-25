@@ -33,14 +33,14 @@ structFill <- function(mm, NArows, varNum, method="mean"){
 }
 
 lmFill <- function(formula, data, NArows, fillvar, method="mean"){
-	form <- with(data, formula)
+
 	mf <- model.frame(formula, data=data, na.action=NULL)
 	mt <- attr(mf, "terms")
 	mm <- model.matrix(mt, mf)
 
 	varNum <- which(attr(attr(mf, "terms"), "term.labels")==fillvar)
 
-	mm <- structFill(mm, NArows, fillvar, method)
+	mm <- structFill(mm, NArows, varNum, method)
 
 	mr <- model.response(mf)
 	mfit <- lm.fit(mm, mr)
@@ -58,4 +58,5 @@ dat <- droplevels(within(dat, {
 m <- lmFill(y~x+country+religion, dat, NArows = dat$country==3, fillvar="religion")
 
 summary(m)
+str(m)
 
