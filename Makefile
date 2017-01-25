@@ -4,7 +4,7 @@
 
 current: target
 
-target pngtarget pdftarget vtarget acrtarget pushtarget: redundancy.Rout 
+target pngtarget pdftarget vtarget acrtarget pushtarget: tztest.Rout 
 
 ##################################################################
 
@@ -128,11 +128,11 @@ ortho.Rout: ortho.R
 ### Why do we care?
 ordinal.Rout: ordinal.R
 
-## Make some data with structural redundancy
-tzdata.Rout: tzdata.R
+## Functions for filling structural redundancies in models
+redundancy.Rout: redundancy.R
 
-## Fit it in different ways
-redundancy.Rout: tzdata.Rout redundancy.R
+## A test
+tztest.Rout: redundancy.Rout tztest.R
 
 ######################################################################
 

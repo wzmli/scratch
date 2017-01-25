@@ -41,16 +41,3 @@ lmFill <- function(formula, data, NArows, fillvar, method="mean"){
 
 	return(mfit)
 }
-
-## Testing (dat is from tzdata.R, read via Makefile, or however you want)
-formula <- y~x+country+religion
-
-dat <- droplevels(within(dat, {
-	religion[country==3] <- NA
-}))
-
-summary(lmFill(y~x+country+religion, dat, NArows = dat$country==3, fillvar="religion"))
-
-summary(lmFill(y~x+country+religion, dat, NArows = dat$country==3, fillvar="religion", method="base"))
-
-
