@@ -12,17 +12,13 @@ formula <- y~x+country+religion
 ## fit a model by setting them either to baseline or mean
 ## Later break this into more functions so we can call the hard one and use it for things other than lm
 
-lmfill <- function(formula, data, NArows, fillvar, method="mean"){
-	dcheck <- na.omit(data[NArows, fillvar])
-	if (length(dcheck)>0){stop("Not all structural NAs are really NA")}
+structFill <- function(mm, NArows, varNum, method="mean"){
 
-	mf <- model.frame(formula, data=data, na.action=NULL)
-	mt <- attr(mf, "terms")
-	mm <- model.matrix(mt, mf)
 	modAssign <- attr(mm, "assign")
-
-	varNum <- which(attr(attr(mf, "terms"), "term.labels")==fillvar)
 	fillcols <- which(modAssign==varNum)
+
+	dcheck <- na.omit(mm[NArows, fillcols])
+	if (length(dcheck)>0){stop("Not all structural NAs are really NA")}
 
 	if(method=="base")
 		mm[NArows, fillcols] <- 0
@@ -33,36 +29,18 @@ lmfill <- function(formula, data, NArows, fillvar, method="mean"){
 	}
 	else stop("Unrecognized method")
 
-	mr <- model.response(mf)
-	mfit <- lm.fit(mm, mr)
-	mfit$call <- match.call()
-	class(mfit) <- "lm"
-	mfit$terms <- terms(mf)
-
-	return(mfit)
+	return(mm)
 }
 
-lmfill <- function(formula, data, NArows, fillvar, method="mean"){
-	dcheck <- na.omit(data[NArows, fillvar])
-	if (length(dcheck)>0){stop("Not all structural NAs are really NA")}
+lmFill <- function(formula, data, NArows, fillvar, method="mean"){
 	form <- with(data, formula)
-
 	mf <- model.frame(formula, data=data, na.action=NULL)
 	mt <- attr(mf, "terms")
 	mm <- model.matrix(mt, mf)
-	modAssign <- attr(mm, "assign")
 
 	varNum <- which(attr(attr(mf, "terms"), "term.labels")==fillvar)
-	fillcols <- which(modAssign==varNum)
 
-	if(method=="base")
-		mm[NArows, fillcols] <- 0
-	else if (method=="mean"){
-		for(col in fillcols){
-			mm[NArows, col] <- mean(mm[!NArows, col])
-		}
-	}
-	else stop("Unrecognized method")
+	mm <- structFill(mm, NArows, fillvar, method)
 
 	mr <- model.response(mf)
 	mfit <- lm.fit(mm, mr)
@@ -77,7 +55,7 @@ dat <- droplevels(within(dat, {
 	religion[country==3] <- NA
 }))
 
-m <- lmfill(y~x+country+religion, dat, NArows = dat$country==3, fillvar="religion")
+m <- lmFill(y~x+country+religion, dat, NArows = dat$country==3, fillvar="religion")
 
 summary(m)
 
