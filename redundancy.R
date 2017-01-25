@@ -1,12 +1,3 @@
-## Baseline version (sanity check, remove soon?)
-formula <- with(dat, y~x+country+religion)
-## Straightforward lm; we think it treats the redundant religion as the baseline religion
-m <- lm(formula)
-print(summary(m))
-
-######################################################################
-
-formula <- y~x+country+religion
 
 ## Given a formula, and a list of rows with structural NAs for a variable, 
 ## fit a model by setting them either to baseline or mean
@@ -51,12 +42,15 @@ lmFill <- function(formula, data, NArows, fillvar, method="mean"){
 	return(mfit)
 }
 
+## Testing (dat is from tzdata.R, read via Makefile, or however you want)
+formula <- y~x+country+religion
+
 dat <- droplevels(within(dat, {
 	religion[country==3] <- NA
 }))
 
-m <- lmFill(y~x+country+religion, dat, NArows = dat$country==3, fillvar="religion")
+summary(lmFill(y~x+country+religion, dat, NArows = dat$country==3, fillvar="religion"))
 
-summary(m)
-str(m)
+summary(lmFill(y~x+country+religion, dat, NArows = dat$country==3, fillvar="religion", method="base"))
+
 
