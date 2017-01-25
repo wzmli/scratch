@@ -15,6 +15,36 @@ formula <- y~x+country+religion
 lmfill <- function(formula, data, NArows, fillvar, method="mean"){
 	dcheck <- na.omit(data[NArows, fillvar])
 	if (length(dcheck)>0){stop("Not all structural NAs are really NA")}
+
+	mf <- model.frame(formula, data=data, na.action=NULL)
+	mt <- attr(mf, "terms")
+	mm <- model.matrix(mt, mf)
+	modAssign <- attr(mm, "assign")
+
+	varNum <- which(attr(attr(mf, "terms"), "term.labels")==fillvar)
+	fillcols <- which(modAssign==varNum)
+
+	if(method=="base")
+		mm[NArows, fillcols] <- 0
+	else if (method=="mean"){
+		for(col in fillcols){
+			mm[NArows, col] <- mean(mm[!NArows, col])
+		}
+	}
+	else stop("Unrecognized method")
+
+	mr <- model.response(mf)
+	mfit <- lm.fit(mm, mr)
+	mfit$call <- match.call()
+	class(mfit) <- "lm"
+	mfit$terms <- terms(mf)
+
+	return(mfit)
+}
+
+lmfill <- function(formula, data, NArows, fillvar, method="mean"){
+	dcheck <- na.omit(data[NArows, fillvar])
+	if (length(dcheck)>0){stop("Not all structural NAs are really NA")}
 	form <- with(data, formula)
 
 	mf <- model.frame(formula, data=data, na.action=NULL)
