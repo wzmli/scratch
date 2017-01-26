@@ -26,12 +26,12 @@ formula <- y~x+country+religion+(1|village)
 summary(lmer(formula, data=dat))
 
 ## Now set the NAs to really be NAs
-dat <- droplevels(within(dat, {
-  religion[country==3] <- NA
-}))
+# dat <- droplevels(within(dat, {
+#   religion[country==3] <- NA
+# }))
 
 ## Set NAs to base level; this matches the default behaviour (but without the dummy level, so better)
-summary(lmFill(y~x+country+religion, dat, NArows = dat$country==3, fillvar="religion", method="base"))
+summary(lmerFill(y~x+country+religion+(1|village), data=dat, NArows = dat$country==3, fillvar="religion", method="base"))
 
 ## Set NAs to model center, or variable mean, or whatever we should call it
 ## Seems better
