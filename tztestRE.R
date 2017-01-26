@@ -31,7 +31,7 @@ summary(lmer(formula, data=dat))
 # }))
 
 ## Set NAs to base level; this matches the default behaviour (but without the dummy level, so better)
-summary(lmerFill(y~x+country+religion+(1|village), data=dat, NArows = dat$country==3, fillvar="religion", method="base"))
+summary(lmerFill(y~x+country+religion+(1|village), data=dat, NArows = dat$country==3, fillvar="religion", me="base"))
 
 ## Set NAs to model center, or variable mean, or whatever we should call it
 ## Seems better

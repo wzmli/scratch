@@ -3,7 +3,7 @@
 ## fit a model by setting them either to baseline or mean
 ## Later break this into more functions so we can call the hard one and use it for things other than lm
 
-structFill <- function(mm, NArows, varNum, method="mean"){
+structFill <- function(mm, NArows, varNum, me="mean"){
   
   modAssign <- attr(mm, "assign")
   fillcols <- which(modAssign==varNum)
@@ -11,9 +11,9 @@ structFill <- function(mm, NArows, varNum, method="mean"){
   # dcheck <- na.omit(mm[NArows, fillcols])
   # if (length(dcheck)>0){stop("Not all structural NAs are really NA")}
   
-  if(method=="base")
+  if(me=="base")
     mm[NArows, fillcols] <- 0
-  else if (method=="mean"){
+  else if (me=="mean"){
     mm[NArows, fillcols] <- matrix(
       colMeans(mm[!NArows,fillcols])
       , nrow=sum(NArows)
@@ -21,12 +21,12 @@ structFill <- function(mm, NArows, varNum, method="mean"){
       , byrow=TRUE
     )
   }
-  else stop("Unrecognized method")
+  else stop("Unrecognized me")
   
   return(mm)
 }
 
-lmerFill <- function (formula, data = NULL, NArows, fillvar, method="mean",REML = TRUE, control = lmerControl(), 
+lmerFill <- function (formula, data = NULL, NArows, fillvar, me="mean",REML = TRUE, control = lmerControl(), 
                       start = NULL, verbose = 0L, subset, weights, na.action, offset, 
                       contrasts = NULL, devFunOnly = FALSE, ...) 
 {
@@ -52,7 +52,7 @@ lmerFill <- function (formula, data = NULL, NArows, fillvar, method="mean",REML 
   mcout$formula <- lmod$formula
   lmod$formula <- NULL
   varNum <- which(attr(attr(lmod$fr, "terms"), "term.labels")==fillvar)
-  lmod$X <- structFill(lmod$X, NArows, varNum, method)
+  lmod$X <- structFill(lmod$X, NArows, varNum, me)
   devfun <- do.call(mkLmerDevfun, c(lmod, list(start = start, 
                                                verbose = verbose, control = control)))
   if (devFunOnly) 
