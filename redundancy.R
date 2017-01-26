@@ -14,10 +14,13 @@ structFill <- function(mm, NArows, varNum, method="mean"){
 	if(method=="base")
 		mm[NArows, fillcols] <- 0
 	else if (method=="mean"){
-		for(col in fillcols){
-			mm[NArows, col] <- mean(mm[!NArows, col])
+			mm[NArows, fillcols] <- matrix(
+			  colMeans(mm[!NArows,fillcols])
+			  , nrow=sum(NArows)
+			  , ncol=length(fillcols)
+			  , byrow=TRUE
+			  )
 		}
-	}
 	else stop("Unrecognized method")
 
 	return(mm)
